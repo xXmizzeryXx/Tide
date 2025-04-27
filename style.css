@@ -1,0 +1,86 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+body {
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg, #0f0f0f, #1c1c1c);
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.container {
+  text-align: center;
+  animation: fadeIn 2s ease forwards;
+}
+
+.title {
+  font-size: 4rem;
+  font-weight: 700;
+}
+
+.dot {
+  color: #00bcd4;
+}
+
+form {
+  margin-top: 20px;
+}
+
+input[type="text"] {
+  padding: 12px;
+  width: 300px;
+  border: none;
+  border-radius: 25px;
+  background: #2b2b2b;
+  color: white;
+  font-size: 1rem;
+  outline: none;
+  transition: 0.3s;
+}
+
+input[type="text"]:focus {
+  background: #383838;
+}
+
+button {
+  margin-top: 15px;
+  padding: 10px 30px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 25px;
+  background: #00bcd4;
+  color: black;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #00a2b0;
+}
+
+.options {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+.loader {
+  font-size: 2rem;
+  color: #00bcd4;
+  animation: pulse 2s infinite;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(20px);}
+  100% { opacity: 1; transform: translateY(0);}
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
