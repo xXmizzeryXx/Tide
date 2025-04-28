@@ -1,3 +1,3 @@
-# Tide 🌊
-a proxy of minimalism, for the modern times.
-currently in testing, dm me on discord if you would like to help with the testing. (mizzery_saltyy)
+# Tide v2 🌊
+a proxy of minimalism, for modern times.
+Currently in testing, dm me on Discord if you would like to help with the testing. (mizzery_saltyy)
