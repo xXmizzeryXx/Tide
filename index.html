@@ -12,19 +12,41 @@
     <div class="container" id="content" style="display: none;">
         <h1 class="title">Tide<span class="dot">.</span></h1>
         <form id="searchForm">
-            <input type="text" id="urlInput" placeholder="Where do you want to go?" autocomplete="off">
+            <input type="text" id="urlInput" placeholder="Surf the Web..." autocomplete="off">
             <div class="options">
                 <label><input type="checkbox" id="blankMode"> Stealth (about:blank)</label>
             </div>
             <button type="submit">Surf 🌊</button>
         </form>
-        
+
         <!-- New Button for the Games Page -->
         <div>
             <button id="play-games" onclick="window.location.href='games.html';">Play Games 🎮</button>
         </div>
     </div>
-    
+
+    <!-- Footer -->
+    <div class="footer">Tide | By Mizzery</div>
+
     <script src="script.js"></script>
+
+    <!-- Firebase Initialization Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
+
+        const firebaseConfig = {
+            apiKey: "YOUR_FIREBASE_API_KEY",
+            authDomain: "tidebymizzery.firebaseapp.com",
+            projectId: "tidebymizzery",
+            storageBucket: "tidebymizzery.firebasestorage.app",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID",
+            measurementId: "YOUR_MEASUREMENT_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+    </script>
 </body>
 </html>
