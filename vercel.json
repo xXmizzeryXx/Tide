@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/uv/:match*",
+      "destination": "/index.html"
+    }
+  ]
+}
