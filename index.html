@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tide</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="stylesheet" href="/assets/css/style.css" />
+</head>
+<body>
+  <script src="/active/uv/uv.bundle.js" defer></script>
+  <script src="/active/uv/uv.config.js" defer></script>
+  <script src="/assets/js/register.js" defer></script>
+  <script src="/assets/js/index.js" defer></script>
+  <div id="loader" class="loader">Loading...</div>
+
+  <div class="container" id="content" style="display: none;">
+    <h1 class="title">Tide<span class="dot">.</span></h1>
+
+    <form id="searchForm">
+      <input type="text" id="urlInput" placeholder="Surf the Web..." autocomplete="off" />
+      <div class="options">
+        <label><input type="checkbox" id="blankMode" /> Stealth (about:blank)</label>
+      </div>
+      <button type="submit">Surf 🌊</button>
+    </form>
+
+    <div>
+      <button onclick="window.location.href='games.html';">Play Games 🎮</button>
+      <button onclick="window.location.href='credits.html';">Credits 📝</button>
+      <button onclick="window.location.href='tidechat.html';">Chat 💬</button>
+    </div>
+  </div>
+
+  <div class="footer">Tide | By Mizzery</div>
+
+</body>
+</html>
