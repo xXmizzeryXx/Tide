@@ -65,7 +65,7 @@ document.getElementById('searchForm').addEventListener('submit', function (e) {
 
 // ✅ Register UV service worker for proper proxy behavior
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/uv/uv.sw.js', { scope: '/uv/' })
+  navigator.serviceWorker.register('/uv/uv.sw.js', { scope: '/active/go/' })
     .then(() => console.log('✅ UV Service Worker registered'))
     .catch(err => console.error('❌ UV Service Worker registration failed:', err));
 }
