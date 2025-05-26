@@ -43,16 +43,40 @@ body {
     color: #a64aff;
 }
 
-/* Chat-specific title */
-.tide-chat-title {
-    font-size: 3rem;
-    font-weight: 700;
-    margin-bottom: 20px;
+/* Sidebar */
+.sidebar {
+    position: fixed;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(25, 25, 25, 0.9);
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: 0 0 12px rgba(166, 74, 255, 0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sidebar button {
+    background: transparent;
+    border: none;
+    font-size: 2rem;
     color: #a64aff;
-    text-shadow:
-        0 0 10px #8a2be2,
-        0 0 20px #a64aff,
-        0 0 30px #c084ff;
+    margin: 10px 0;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.sidebar button:hover {
+    color: #d197ff;
+}
+
+.sidebar-info {
+    margin-top: 10px;
+    font-size: 1rem;
+    color: white;
+    text-shadow: 0 0 5px #a64aff;
 }
 
 /* Inputs with storm glow */
@@ -92,24 +116,6 @@ button:hover {
     background: #d197ff;
 }
 
-/* Game buttons */
-.game-btn {
-    margin-top: 20px;
-    padding: 12px 35px;
-    font-size: 1.2rem;
-    background: #c084ff;
-    color: white;
-    font-weight: 700;
-    border-radius: 25px;
-    cursor: pointer;
-    border: none;
-    transition: 0.3s;
-}
-
-.game-btn:hover {
-    background: #a64aff;
-}
-
 /* Footer Glow */
 .footer {
     position: fixed;
@@ -135,21 +141,4 @@ button:hover {
 @keyframes pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.5; }
-}
-
-/* Chat Container Glow */
-.chat-container-glow {
-    box-shadow:
-        0 0 10px #a64aff,
-        0 0 20px #9933ff,
-        0 0 30px #8000ff;
-    border-radius: 10px;
-    transition: box-shadow 0.3s ease;
-}
-
-.chat-container-glow:hover {
-    box-shadow:
-        0 0 20px #a64aff,
-        0 0 40px #9933ff,
-        0 0 60px #8000ff;
 }
