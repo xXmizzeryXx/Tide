@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tide Movies</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- UV Static Scripts -->
+  <script src="/active/uv/uv.bundle.js"></script>
+  <script src="/active/uv/uv.config.js"></script>
+
+  <style>
+    .iframe-container {
+      width: 100%;
+      height: calc(100vh - 100px);
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    iframe {
+      width: 90%;
+      height: 100%;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(166, 74, 255, 0.3);
+    }
+
+    .top-bar {
+      text-align: center;
+      margin-top: 20px;
+      animation: fadeIn 1.5s ease;
+    }
+
+    .back-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: #a64aff;
+      color: #000;
+      font-weight: 600;
+      padding: 10px 25px;
+      border-radius: 20px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: 0.3s;
+      z-index: 10;
+    }
+
+    .back-btn:hover {
+      background: #d197ff;
+    }
+  </style>
+</head>
+<body>
+  <button class="back-btn" onclick="window.location.href='index.html'">← Back to Tide</button>
+
+  <div class="top-bar">
+    <h1 class="title">Tide<span class="dot">Movies</span></h1>
+  </div>
+
+  <div class="iframe-container">
+    <iframe id="movieFrame" allowfullscreen></iframe>
+  </div>
+
+  <script>
+    // Encode the movie URL using UV
+    const url = "https://playervpn.github.io/movies";
+    const encoded = __uv$config.encodeUrl(url);
+    const proxyUrl = __uv$config.prefix + encoded;
+
+    document.getElementById("movieFrame").src = proxyUrl;
+  </script>
+</body>
+</html>
