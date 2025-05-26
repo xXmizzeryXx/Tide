@@ -50,13 +50,16 @@ body {
     top: 50%;
     transform: translateY(-50%);
     background: rgba(25, 25, 25, 0.9);
-    padding: 15px;
-    border-radius: 15px;
-    box-shadow: 0 0 12px rgba(166, 74, 255, 0.9);
+    padding: 10px; /* Reduced padding */
+    width: 60px; /* Adjusted width */
+    border-radius: 10px;
+    box-shadow: 0 0 8px rgba(166, 74, 255, 0.9);
     display: flex;
     flex-direction: column;
     align-items: center;
 }
+
+
 
 .sidebar button {
     background: transparent;
