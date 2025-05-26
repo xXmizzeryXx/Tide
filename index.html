@@ -12,6 +12,25 @@
   <script src="/active/uv/uv.config.js" defer></script>
   <script src="/assets/js/register.js" defer></script>
   <script src="/assets/js/index.js" defer></script>
+  <script defer>
+    // Update battery status
+    navigator.getBattery().then(battery => {
+      function updateBattery() {
+        document.getElementById("battery").textContent = `${Math.round(battery.level * 100)}% ⚡`;
+      }
+      updateBattery();
+      battery.addEventListener("levelchange", updateBattery);
+    });
+
+    // Update time
+    function updateTime() {
+      const now = new Date();
+      document.getElementById("time").textContent = now.toLocaleTimeString();
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
+  </script>
+
   <div id="loader" class="loader">Loading...</div>
 
   <div class="container" id="content" style="display: none;">
@@ -24,12 +43,17 @@
       </div>
       <button type="submit">Surf 🌊</button>
     </form>
+  </div>
 
-    <div>
-      <button onclick="window.location.href='games.html';">Play Games 🎮</button>
-      <button onclick="window.location.href='credits.html';">Credits 📝</button>
-      <button onclick="window.location.href='tidechat.html';">Chat 💬</button>
-      <button onclick="window.location.href='movies.html';">Movies 🎬</button>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <button onclick="window.location.href='games.html';">🎮</button>
+    <button onclick="window.location.href='movies.html';">🎬</button>
+    <button onclick="window.location.href='tidechat.html';">💬</button>
+    <button onclick="window.location.href='credits.html';">📝</button>
+    <div class="sidebar-info">
+      <span id="battery">⚡</span>
+      <span id="time">⌚</span>
     </div>
   </div>
 
