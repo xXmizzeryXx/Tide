@@ -3,7 +3,7 @@
 body {
     margin: 0;
     padding: 0;
-    background: linear-gradient(135deg, #2c003e, #000000);
+    background: linear-gradient(135deg, #001f3f, #000000); /* Navy to black */
     color: #fff;
     font-family: 'Poppins', sans-serif;
     height: 100vh;
@@ -19,28 +19,28 @@ body {
     animation: fadeIn 2s ease forwards;
 }
 
-/* Storm Title Glow */
+/* Patriotic Title Glow */
 .title {
     font-size: 4rem;
     font-weight: 700;
     text-shadow:
-        0 0 10px #a64aff,
-        0 0 20px #9933ff,
-        0 0 30px #8000ff;
+        0 0 10px #ff4136,   /* Red */
+        0 0 20px #0074D9,   /* Blue */
+        0 0 30px #ffffff;   /* White */
 }
 
-/* Lightning Flicker Effect */
+/* Fireworks Flicker Background */
 @keyframes flickerBackground {
-    0%, 100% { background: linear-gradient(135deg, #2c003e, #000000); }
-    10% { background: linear-gradient(135deg, #3e006b, #1c0030); }
-    20% { background: linear-gradient(135deg, #4a0080, #000); }
-    25% { background: linear-gradient(135deg, #5f00a5, #0b0020); }
-    30%, 90% { background: linear-gradient(135deg, #2c003e, #000000); }
+    0%, 100% { background: linear-gradient(135deg, #001f3f, #000000); }
+    10% { background: linear-gradient(135deg, #003366, #111111); }
+    20% { background: linear-gradient(135deg, #0074D9, #000); }
+    25% { background: linear-gradient(135deg, #ff4136, #000022); }
+    30%, 90% { background: linear-gradient(135deg, #001f3f, #000000); }
 }
 
 /* Electric Dot */
 .dot {
-    color: #a64aff;
+    color: #ff4136; /* Red */
 }
 
 /* Sidebar */
@@ -50,39 +50,38 @@ body {
     top: 50%;
     transform: translateY(-50%);
     background: rgba(25, 25, 25, 0.9);
-    padding: 10px; /* Reduced padding */
-    width: 60px; /* Adjusted width */
+    padding: 10px;
+    width: 60px;
     border-radius: 10px;
-    box-shadow: 0 0 8px rgba(166, 74, 255, 0.9);
+    box-shadow: 0 0 8px rgba(0, 116, 217, 0.9); /* Blue glow */
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-
-
 .sidebar button {
     background: transparent;
     border: none;
     font-size: 2rem;
-    color: #a64aff;
+    color: #ffffff;
     margin: 10px 0;
     cursor: pointer;
     transition: 0.3s;
+    text-shadow: 0 0 6px #0074D9;
 }
 
 .sidebar button:hover {
-    color: #d197ff;
+    color: #ffdc00; /* Yellow accent hover */
 }
 
 .sidebar-info {
     margin-top: 10px;
     font-size: 1rem;
     color: white;
-    text-shadow: 0 0 5px #a64aff;
+    text-shadow: 0 0 5px #0074D9;
 }
 
-/* Inputs with storm glow */
+/* Inputs with red/blue glow */
 input[type="text"] {
     padding: 12px;
     width: 300px;
@@ -93,12 +92,12 @@ input[type="text"] {
     font-size: 1rem;
     outline: none;
     transition: 0.3s;
-    box-shadow: 0 0 8px rgba(166, 74, 255, 0.4);
+    box-shadow: 0 0 8px rgba(0, 116, 217, 0.4); /* Blue */
 }
 
 input[type="text"]:focus {
     background: rgba(35, 35, 35, 0.95);
-    box-shadow: 0 0 12px rgba(166, 74, 255, 0.9);
+    box-shadow: 0 0 12px rgba(255, 65, 54, 0.9); /* Red */
 }
 
 /* Buttons */
@@ -108,15 +107,15 @@ button {
     font-size: 1rem;
     border: none;
     border-radius: 25px;
-    background: #a64aff;
-    color: black;
+    background: #0074D9; /* Blue */
+    color: white;
     cursor: pointer;
     transition: 0.3s;
     animation: wave 3s infinite;
 }
 
 button:hover {
-    background: #d197ff;
+    background: #ff4136; /* Red hover */
 }
 
 /* Footer Glow */
@@ -125,8 +124,8 @@ button:hover {
     bottom: 10px;
     right: 15px;
     font-size: 0.9rem;
-    color: rgba(200, 132, 255, 0.7);
-    text-shadow: 0 0 5px #a64aff;
+    color: rgba(255, 255, 255, 0.8);
+    text-shadow: 0 0 5px #0074D9;
 }
 
 /* Animations */
