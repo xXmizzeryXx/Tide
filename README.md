@@ -1,4 +1,4 @@
-# Tide v3.6 (The Storm Update) 🌊
+# Tide v3.7 (Patriotic) 🌊
 a proxy of minimalism, for modern times.
 created by the tide team and xXmizzeryXx (or just mizzery, doesn't really matter.)
 updated constantly with ui and game addons
