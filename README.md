@@ -5,3 +5,5 @@ updated constantly with ui and game addons
 join the wave today and ride the tide!
 
 <h3>Tide is no longer just chill — <strong>it's charged.</strong></h3>
+
+<h4>officially part of the Elusion family.</h4>
