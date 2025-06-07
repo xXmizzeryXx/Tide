@@ -5,59 +5,478 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Tide</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
-  <link rel="stylesheet" href="/assets/css/style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+    .password-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    
+    .modal-content {
+      background: linear-gradient(135deg, #001f3f, #1a1a2e);
+      padding: 2rem;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      position: relative;
+      border: 1px solid rgba(0, 116, 217, 0.5);
+      box-shadow: 0 0 20px rgba(0, 116, 217, 0.5);
+      animation: glow 2s infinite alternate;
+    }
+    
+    @keyframes glow {
+      from {
+        box-shadow: 0 0 20px rgba(0, 116, 217, 0.5);
+      }
+      to {
+        box-shadow: 0 0 30px rgba(0, 116, 217, 0.8);
+      }
+    }
+    
+    .modal-content.error {
+      animation: glow-error 2s infinite alternate;
+    }
+    
+    @keyframes glow-error {
+      from {
+        box-shadow: 0 0 20px rgba(255, 65, 54, 0.5);
+      }
+      to {
+        box-shadow: 0 0 30px rgba(255, 65, 54, 0.8);
+      }
+    }
+    
+    .modal-content h2 {
+      color: #fff;
+      margin-bottom: 1.5rem;
+      font-size: 1.8rem;
+      background: linear-gradient(135deg, #fff, #0074D9);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .modal-content p {
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 1.5rem;
+      font-size: 1rem;
+    }
+    
+    .modal-content a {
+      color: #0074D9;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    
+    .modal-content a:hover {
+      color: #5a8fff;
+      text-decoration: underline;
+    }
+    
+    .password-input {
+      width: 100%;
+      padding: 12px 15px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 116, 217, 0.5);
+      background-color: rgba(10, 10, 20, 0.8);
+      color: white;
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+    
+    .password-input:focus {
+      border-color: #0074D9;
+      box-shadow: 0 0 0 2px rgba(0, 116, 217, 0.3);
+    }
+    
+    .submit-btn {
+      background: linear-gradient(135deg, #0074D9, #5a8fff);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      font-size: 1rem;
+    }
+    
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 116, 217, 0.4);
+    }
+    
+    .error-message {
+      color: #ff4136;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      display: none;
+    }
+    
+    .blur-content {
+      filter: blur(5px);
+      pointer-events: none;
+      user-select: none;
+    }
+
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #001f3f, #000000);
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      animation: flickerBackground 6s infinite ease-in-out;
+    }
+
+    .container {
+      text-align: center;
+      animation: fadeIn 2s ease forwards;
+    }
+
+
+    .title {
+      font-size: 4rem;
+      font-weight: 700;
+      text-shadow:
+        0 0 10px #ff4136,
+        0 0 20px #0074D9,
+        0 0 30px #ffffff;
+    }
+
+
+    @keyframes flickerBackground {
+      0%, 100% { background: linear-gradient(135deg, #001f3f, #000000); }
+      10% { background: linear-gradient(135deg, #003366, #111111); }
+      20% { background: linear-gradient(135deg, #0074D9, #000); }
+      25% { background: linear-gradient(135deg, #ff4136, #000022); }
+      30%, 90% { background: linear-gradient(135deg, #001f3f, #000000); }
+    }
+
+
+    .dot {
+      color: #ff4136;
+    }
+
+
+    .sidebar {
+      position: fixed;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(25, 25, 25, 0.9);
+      padding: 10px;
+      width: 60px;
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0, 116, 217, 0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .sidebar button {
+      background: transparent;
+      border: none;
+      font-size: 2rem;
+      color: #ffffff;
+      margin: 10px 0;
+      cursor: pointer;
+      transition: 0.3s;
+      text-shadow: 0 0 6px #0074D9;
+    }
+
+    .sidebar button:hover {
+      color: #ffdc00;
+    }
+
+    .sidebar-info {
+      margin-top: 10px;
+      font-size: 1rem;
+      color: white;
+      text-shadow: 0 0 5px #0074D9;
+    }
+
+
+    input[type="text"] {
+      padding: 12px;
+      width: 300px;
+      border: none;
+      border-radius: 25px;
+      background: rgba(25, 25, 25, 0.9);
+      color: white;
+      font-size: 1rem;
+      outline: none;
+      transition: 0.3s;
+      box-shadow: 0 0 8px rgba(0, 116, 217, 0.4);
+    }
+
+    input[type="text"]:focus {
+      background: rgba(35, 35, 35, 0.95);
+      box-shadow: 0 0 12px rgba(255, 65, 54, 0.9);
+    }
+
+
+    button {
+      margin-top: 15px;
+      padding: 10px 30px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 25px;
+      background: #0074D9;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+      animation: wave 3s infinite;
+    }
+
+    button:hover {
+      background: #ff4136;
+    }
+
+
+    .footer {
+      position: fixed;
+      bottom: 10px;
+      right: 15px;
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.8);
+      text-shadow: 0 0 5px #0074D9;
+    }
+
+
+    @keyframes wave {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+      100% { transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+ 
+    .loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.5rem;
+      background: linear-gradient(135deg, #001f3f, #000000);
+      z-index: 999;
+    }
+  </style>
 </head>
 <body>
+  <!-- Note : THis is the password modal if you need to edit anything please do it here-->
+  <div class="password-modal" id="passwordModal">
+    <div class="modal-content" id="modalContent">
+      <h2>Welcome to Tide</h2>
+      <p>Please enter the password to access this site</p>
+      <input type="password" class="password-input" id="passwordInput" placeholder="Enter password">                                                                                                                                                                                                                                                                                                           <!--The serprise is found right here please go to the very end of the line and read it-->
+      <button class="submit-btn" id="submitPassword">Submit</button>
+      <p>If you don't know the password join the server <a href="https://dsc.gg/runelusion" target="_blank">here</a></p>
+      <div class="error-message" id="errorMessage">
+        Incorrect password. Please try again or contact the admins.
+      </div>
+    </div>
+  </div>
+
+<!--Note : The loading page I have added-->
+  <div id="mainContent" class="blur-content">
+    <div id="loader" class="loader">Loading...</div>
+<!--Yep, here Ima work on the AI again this time a better ai look for it.-->
+    <div class="container" id="content" style="display: none;">
+      <h1 class="title">Tide<span class="dot">.</span></h1>
+
+      <form id="searchForm">
+        <input type="text" id="urlInput" placeholder="Surf the Web..." autocomplete="off" />
+        <div class="options">
+          <label><input type="checkbox" id="blankMode" /> Stealth (about:blank)</label>
+        </div>
+        <button type="submit">Surf 🌊</button>
+      </form>
+    </div>
+
+
+    <div class="sidebar">
+      <button onclick="window.location.href='games.html';"><i class="bi bi-joystick"></i></button>
+      <button onclick="window.location.href='movies.html';"><i class="bi bi-film"></i></button>
+      <button onclick="window.location.href='tidechat.html';"><i class="bi bi-chat-dots"></i></button>
+      <button onclick="window.location.href='credits.html';"><i class="bi bi-info-circle"></i></button>
+      <div class="sidebar-info">
+        <span id="battery">⚡</span>
+        <span id="time">⌚</span>
+      </div>
+    </div>
+
+    <div class="footer">Tide | By Mizzery</div>
+  </div>
+<!--Note this html code is for the search functionality everything you had is still there-->
   <script src="/active/uv/uv.bundle.js" defer></script>
   <script src="/active/uv/uv.config.js" defer></script>
   <script src="/assets/js/register.js" defer></script>
   <script src="/assets/js/index.js" defer></script>
-  <script defer>
-    // Update battery status
-    navigator.getBattery().then(battery => {
-      function updateBattery() {
-        document.getElementById("battery").textContent = `${Math.round(battery.level * 100)}% ⚡`;
+  <script>
+
+    const passwordModal = document.getElementById('passwordModal');
+    const modalContent = document.getElementById('modalContent');
+    const passwordInput = document.getElementById('passwordInput');
+    const submitPassword = document.getElementById('submitPassword');
+    const errorMessage = document.getElementById('errorMessage');
+    const mainContent = document.getElementById('mainContent');
+    const loader = document.getElementById('loader');
+    const content = document.getElementById('content');
+    // N0te
+    // Warnings are left here for you before you change anything read those
+    const CORRECT_PASSWORD = "Tide123"; // N0te this is where you have to change your password just incase you got confused
+    const STORAGE_KEY = "tide_auth"; // Note if we remove this local storage might not work as well
+    const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // NOte @mizz letting u know if you want to change the inactivity time out it is setted as 30 minutes right now for changing minutes just change the muber 30 nothing else
+    
+    let inactivityTimer;
+    let isAuthenticated = false;
+
+    function checkSavedPassword() {
+      const savedPassword = localStorage.getItem(STORAGE_KEY);
+      if (savedPassword && savedPassword === CORRECT_PASSWORD) {
+        hidePasswordModal();
+        return true;
       }
-      updateBattery();
-      battery.addEventListener("levelchange", updateBattery);
+      return false;
+    }
+
+    function showPasswordModal() {
+      passwordModal.style.display = 'flex';
+      mainContent.classList.add('blur-content');
+      passwordInput.focus();
+      isAuthenticated = false;
+      resetInactivityTimer();
+    }
+
+    function hidePasswordModal() {
+      passwordModal.style.display = 'none';
+      mainContent.classList.remove('blur-content');
+      isAuthenticated = true;
+      resetInactivityTimer();
+      
+    
+      localStorage.setItem(STORAGE_KEY, CORRECT_PASSWORD);
+      
+    
+      setTimeout(() => {
+        loader.style.display = 'none';
+        content.style.display = 'block';
+      }, 1500);
+    }
+
+    function checkPassword() {
+      if (passwordInput.value === CORRECT_PASSWORD) {
+        hidePasswordModal();
+        modalContent.classList.remove('error');
+        errorMessage.style.display = 'none';
+      } else {
+        modalContent.classList.add('error');
+        errorMessage.style.display = 'block';
+        passwordInput.value = '';
+        passwordInput.focus();
+      }
+    }
+
+    function resetInactivityTimer() {
+      if (inactivityTimer) {
+        clearTimeout(inactivityTimer);
+      }
+      
+      if (isAuthenticated) {
+        inactivityTimer = setTimeout(() => {
+          showPasswordModal();
+          localStorage.removeItem(STORAGE_KEY);
+        }, INACTIVITY_TIMEOUT);
+      }
+    }
+
+
+    submitPassword.addEventListener('click', checkPassword);
+    passwordInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        checkPassword();
+      }
     });
 
-    // Update time
-    function updateTime() {
-      const now = new Date();
-      document.getElementById("time").textContent = now.toLocaleTimeString();
-    }
-    setInterval(updateTime, 1000);
-    updateTime();
+    const activityEvents = ['mousemove', 'keydown', 'click', 'scroll'];
+    activityEvents.forEach(event => {
+      document.addEventListener(event, () => {
+        if (isAuthenticated) {
+          resetInactivityTimer();
+        }
+      });
+    });
+
+    document.addEventListener('visibilitychange', function() {
+      if (document.visibilityState === 'hidden') {
+        showPasswordModal();
+      }
+    });
+
+
+    window.onload = function() {
+      const hasSavedPassword = checkSavedPassword();
+      if (!hasSavedPassword) {
+        showPasswordModal();
+      } else {
+        setTimeout(() => {
+          loader.style.display = 'none';
+          content.style.display = 'block';
+        }, 1500);
+      }
+
+
+      navigator.getBattery().then(battery => {
+        function updateBattery() {
+          document.getElementById("battery").textContent = `${Math.round(battery.level * 100)}% ⚡`;
+        }
+        updateBattery();
+        battery.addEventListener("levelchange", updateBattery);
+      });
+
+
+      function updateTime() {
+        const now = new Date();
+        document.getElementById("time").textContent = now.toLocaleTimeString();
+      }
+      setInterval(updateTime, 1000);
+      updateTime();
+    };
   </script>
-
-  <div id="loader" class="loader">Loading...</div>
-
-  <div class="container" id="content" style="display: none;">
-    <h1 class="title">Tide<span class="dot">.</span></h1>
-
-    <form id="searchForm">
-      <input type="text" id="urlInput" placeholder="Surf the Web..." autocomplete="off" />
-      <div class="options">
-        <label><input type="checkbox" id="blankMode" /> Stealth (about:blank)</label>
-      </div>
-      <button type="submit">Surf 🌊</button>
-    </form>
-  </div>
-
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <button onclick="window.location.href='games.html';">🎮</button>
-    <button onclick="window.location.href='movies.html';">🎬</button>
-    <button onclick="window.location.href='tidechat.html';">💬</button>
-    <button onclick="window.location.href='credits.html';">📝</button>
-    <div class="sidebar-info">
-      <span id="battery">⚡</span>
-      <span id="time">⌚</span>
-    </div>
-  </div>
-
-  <div class="footer">Tide | By Mizzery</div>
-
 </body>
 </html>
+<!--you made it here congrats now u have to look for somewhere inside the body tag!-->
