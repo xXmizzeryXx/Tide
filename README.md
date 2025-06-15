@@ -52,7 +52,7 @@ All accessible via the animated sidebar.
 
 ```bash
 # Clone the repo
-git clone https://github.com/YOUR_USERNAME/Tide.git
+git clone https://github.com/xXmizzeryXx/Tide.git
 
 # Navigate to the directory
 cd Tide
