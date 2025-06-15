@@ -6,7 +6,7 @@ Created by the Tide Team and [xXmizzeryXx](https://github.com/xXmizzeryXx) (or j
 ---
 
 > Tide is no longer just chill — it’s **charged.**  
-> Now officially part of the **[Elusion](https://dsc.gg/evadionprox)** family.
+> Now officially part of the **[Elusion](https://dsc.gg/elusionprox)** family.
 
 ## ⚡ Overview
 
