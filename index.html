@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Tide</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
   <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 <body>
@@ -13,23 +13,10 @@
     <div></div><div></div><div></div><div></div><div></div>
   </div>
 
-  <div class="password-modal" id="passwordModal">
-    <div class="modal-content" id="modalContent">
-      <h2>Welcome to Tide</h2>
-      <p>Please enter the password to access this site</p>
-      <input type="password" class="password-input" id="passwordInput" placeholder="Enter password">
-      <button class="submit-btn" id="submitPassword">Submit</button>
-      <p>If you don't know the password join the server <a href="https://dsc.gg/runelusion" target="_blank">here</a></p>
-      <div class="error-message" id="errorMessage">
-        Incorrect password. Please try again or contact the admins.
-      </div>
-    </div>
-  </div>
+  <div id="mainContent">
+    <div id="loader" class="loader" style="display:none;">Loading...</div>
 
-  <div id="mainContent" class="blur-content">
-    <div id="loader" class="loader">Loading...</div>
-
-    <div class="container" id="content" style="display: none;">
+    <div class="container" id="content">
       <h1 class="title">Tide<span class="dot">.</span></h1>
 
       <form id="searchForm">
@@ -60,107 +47,27 @@
   <script src="/assets/js/register.js" defer></script>
   <script src="/assets/js/index.js" defer></script>
   <script>
-    const passwordModal = document.getElementById('passwordModal');
-    const modalContent = document.getElementById('modalContent');
-    const passwordInput = document.getElementById('passwordInput');
-    const submitPassword = document.getElementById('submitPassword');
-    const errorMessage = document.getElementById('errorMessage');
-    const mainContent = document.getElementById('mainContent');
-    const loader = document.getElementById('loader');
-    const content = document.getElementById('content');
-    const CORRECT_PASSWORD = "Tide123";
-    const STORAGE_KEY = "tide_auth";
-    const INACTIVITY_TIMEOUT = 30 * 60 * 1000;
-
-    let inactivityTimer;
-    let isAuthenticated = false;
-
-    function checkSavedPassword() {
-      const savedPassword = localStorage.getItem(STORAGE_KEY);
-      if (savedPassword && savedPassword === CORRECT_PASSWORD) {
-        hidePasswordModal();
-        return true;
-      }
-      return false;
-    }
-
-    function showPasswordModal() {
-      passwordModal.style.display = 'flex';
-      mainContent.classList.add('blur-content');
-      passwordInput.focus();
-      isAuthenticated = false;
-      resetInactivityTimer();
-    }
-
-    function hidePasswordModal() {
-      passwordModal.style.display = 'none';
-      mainContent.classList.remove('blur-content');
-      isAuthenticated = true;
-      resetInactivityTimer();
-      localStorage.setItem(STORAGE_KEY, CORRECT_PASSWORD);
-      setTimeout(() => {
-        loader.style.display = 'none';
-        content.style.display = 'block';
-      }, 1500);
-    }
-
-    function checkPassword() {
-      if (passwordInput.value === CORRECT_PASSWORD) {
-        hidePasswordModal();
-        modalContent.classList.remove('error');
-        errorMessage.style.display = 'none';
-      } else {
-        modalContent.classList.add('error');
-        errorMessage.style.display = 'block';
-        passwordInput.value = '';
-        passwordInput.focus();
-      }
-    }
-
-    function resetInactivityTimer() {
-      if (inactivityTimer) clearTimeout(inactivityTimer);
-      if (isAuthenticated) {
-        inactivityTimer = setTimeout(() => {
-          showPasswordModal();
-          localStorage.removeItem(STORAGE_KEY);
-        }, INACTIVITY_TIMEOUT);
-      }
-    }
-
-    submitPassword.addEventListener('click', checkPassword);
-    passwordInput.addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') checkPassword();
-    });
-
-    ['mousemove', 'keydown', 'click', 'scroll'].forEach(event => {
-      document.addEventListener(event, () => {
-        if (isAuthenticated) resetInactivityTimer();
-      });
-    });
-
-    document.addEventListener('visibilitychange', function() {
-      if (document.visibilityState === 'hidden') showPasswordModal();
-    });
+    // Removed password modal code completely
 
     window.onload = function() {
-      const hasSavedPassword = checkSavedPassword();
-      if (!hasSavedPassword) {
-        showPasswordModal();
-      } else {
-        setTimeout(() => {
-          loader.style.display = 'none';
-          content.style.display = 'block';
-        }, 1500);
+      // Show main content immediately
+      const loader = document.getElementById('loader');
+      const content = document.getElementById('content');
+      loader.style.display = 'none';
+      content.style.display = 'block';
+
+      // Battery status
+      if (navigator.getBattery) {
+        navigator.getBattery().then(battery => {
+          function updateBattery() {
+            document.getElementById("battery").textContent = `${Math.round(battery.level * 100)}% ⚡`;
+          }
+          updateBattery();
+          battery.addEventListener("levelchange", updateBattery);
+        });
       }
 
-      navigator.getBattery().then(battery => {
-        function updateBattery() {
-          document.getElementById("battery").textContent = `${Math.round(battery.level * 100)}% ⚡`;
-        }
-        updateBattery();
-        battery.addEventListener("levelchange", updateBattery);
-      });
-
+      // Time update every second
       function updateTime() {
         const now = new Date();
         document.getElementById("time").textContent = now.toLocaleTimeString();
