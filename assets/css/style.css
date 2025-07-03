@@ -1,146 +1,164 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
 
 body {
-    margin: 0;
-    padding: 0;
-    background: linear-gradient(135deg, #001f3f, #000000); /* Navy to black */
-    color: #fff;
-    font-family: 'Poppins', sans-serif;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    animation: flickerBackground 6s infinite ease-in-out;
+  margin: 0;
+  padding: 0;
+  background: radial-gradient(ellipse at center, #002c4a 0%, #000914 100%);
+  background-size: 200% 200%;
+  animation: waterPulse 8s ease-in-out infinite;
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
 .container {
-    text-align: center;
-    animation: fadeIn 2s ease forwards;
+  text-align: center;
+  animation: fadeIn 2s ease forwards, floaty 6s ease-in-out infinite;
 }
 
-/* Patriotic Title Glow */
 .title {
-    font-size: 4rem;
-    font-weight: 700;
-    text-shadow:
-        0 0 10px #ff4136,   /* Red */
-        0 0 20px #0074D9,   /* Blue */
-        0 0 30px #ffffff;   /* White */
+  font-size: 4rem;
+  font-weight: 700;
+  text-shadow: 0 0 10px #00ffe7, 0 0 20px #00d4ff, 0 0 30px #0088ff;
 }
 
-/* Fireworks Flicker Background */
-@keyframes flickerBackground {
-    0%, 100% { background: linear-gradient(135deg, #001f3f, #000000); }
-    10% { background: linear-gradient(135deg, #003366, #111111); }
-    20% { background: linear-gradient(135deg, #0074D9, #000); }
-    25% { background: linear-gradient(135deg, #ff4136, #000022); }
-    30%, 90% { background: linear-gradient(135deg, #001f3f, #000000); }
-}
-
-/* Electric Dot */
 .dot {
-    color: #ff4136; /* Red */
+  color: #00ffe7;
+  text-shadow: 0 0 8px #00ffe7;
 }
 
-/* Sidebar */
 .sidebar {
-    position: fixed;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(25, 25, 25, 0.9);
-    padding: 10px;
-    width: 60px;
-    border-radius: 10px;
-    box-shadow: 0 0 8px rgba(0, 116, 217, 0.9); /* Blue glow */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  position: fixed;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 25, 40, 0.85);
+  padding: 10px;
+  width: 60px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .sidebar button {
-    background: transparent;
-    border: none;
-    font-size: 2rem;
-    color: #ffffff;
-    margin: 10px 0;
-    cursor: pointer;
-    transition: 0.3s;
-    text-shadow: 0 0 6px #0074D9;
+  background: transparent;
+  border: none;
+  font-size: 2rem;
+  color: #ffffff;
+  margin: 10px 0;
+  cursor: pointer;
+  transition: 0.3s;
+  text-shadow: 0 0 8px #00ffe7;
 }
 
 .sidebar button:hover {
-    color: #ffdc00; /* Yellow accent hover */
+  color: #00bfff;
+  text-shadow: 0 0 10px #00ffe7;
 }
 
 .sidebar-info {
-    margin-top: 10px;
-    font-size: 1rem;
-    color: white;
-    text-shadow: 0 0 5px #0074D9;
+  margin-top: 10px;
+  font-size: 1rem;
+  color: white;
+  text-shadow: 0 0 5px #00d4ff;
 }
 
-/* Inputs with red/blue glow */
 input[type="text"] {
-    padding: 12px;
-    width: 300px;
-    border: none;
-    border-radius: 25px;
-    background: rgba(25, 25, 25, 0.9);
-    color: white;
-    font-size: 1rem;
-    outline: none;
-    transition: 0.3s;
-    box-shadow: 0 0 8px rgba(0, 116, 217, 0.4); /* Blue */
+  padding: 12px;
+  width: 300px;
+  border: none;
+  border-radius: 25px;
+  background: rgba(25, 35, 45, 0.85);
+  color: white;
+  font-size: 1rem;
+  outline: none;
+  transition: 0.3s;
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
 }
 
 input[type="text"]:focus {
-    background: rgba(35, 35, 35, 0.95);
-    box-shadow: 0 0 12px rgba(255, 65, 54, 0.9); /* Red */
+  background: rgba(35, 45, 55, 0.95);
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.8);
 }
 
-/* Buttons */
 button {
-    margin-top: 15px;
-    padding: 10px 30px;
-    font-size: 1rem;
-    border: none;
-    border-radius: 25px;
-    background: #0074D9; /* Blue */
-    color: white;
-    cursor: pointer;
-    transition: 0.3s;
-    animation: wave 3s infinite;
+  margin-top: 15px;
+  padding: 10px 30px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 25px;
+  background: linear-gradient(135deg, #00d4ff, #0074ff);
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
+  animation: wave 3s infinite;
 }
 
 button:hover {
-    background: #ff4136; /* Red hover */
+  background: linear-gradient(135deg, #0088ff, #00ffe7);
+  box-shadow: 0 0 10px #00ffe7;
 }
 
-/* Footer Glow */
 .footer {
-    position: fixed;
-    bottom: 10px;
-    right: 15px;
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.8);
-    text-shadow: 0 0 5px #0074D9;
+  position: fixed;
+  bottom: 10px;
+  right: 15px;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-shadow: 0 0 5px #00d4ff;
 }
 
-/* Animations */
+.bubbles {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.bubbles div {
+  position: absolute;
+  bottom: -100px;
+  width: 20px; height: 20px;
+  background: rgba(0, 255, 255, 0.2);
+  border-radius: 50%;
+  animation: rise 10s infinite ease-in;
+}
+.bubbles div:nth-child(1) { left: 10%; animation-delay: 0s; }
+.bubbles div:nth-child(2) { left: 30%; animation-delay: 2s; }
+.bubbles div:nth-child(3) { left: 50%; animation-delay: 4s; }
+.bubbles div:nth-child(4) { left: 70%; animation-delay: 1s; }
+.bubbles div:nth-child(5) { left: 90%; animation-delay: 3s; }
+
 @keyframes wave {
-    0% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
-    100% { transform: translateY(0); }
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+  100% { transform: translateY(0); }
 }
 
 @keyframes fadeIn {
-    0% { opacity: 0; transform: translateY(20px); }
-    100% { opacity: 1; transform: translateY(0); }
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes waterPulse {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes rise {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-120vh); opacity: 0; }
 }
