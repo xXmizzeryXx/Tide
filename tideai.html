@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tide AI</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #001f3f, #000000);
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: flickerBackground 6s infinite ease-in-out;
+    }
+
+    @keyframes flickerBackground {
+      0%, 100% { background: linear-gradient(135deg, #001f3f, #000000); }
+      10% { background: linear-gradient(135deg, #003366, #111111); }
+      20% { background: linear-gradient(135deg, #0074D9, #000); }
+      25% { background: linear-gradient(135deg, #ff4136, #000022); }
+      30%, 90% { background: linear-gradient(135deg, #001f3f, #000000); }
+    }
+
+    .container {
+      text-align: center;
+      width: 90%;
+      max-width: 800px;
+      margin: 20px auto;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 120px);
+    }
+
+    .title {
+      font-size: 1rem;
+      font-weight: 700;
+      text-shadow:
+        0 0 10px #ff4136,
+        0 0 20px #0074D9,
+        0 0 30px #ffffff;
+      margin-bottom: 15px;
+    }
+
+    .dot {
+      color: #ff4136;
+    }
+
+    
+    .sidebar {
+      position: fixed;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(25, 25, 25, 0.9);
+      padding: 10px;
+      width: 60px;
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0, 116, 217, 0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .sidebar button {
+      background: transparent;
+      border: none;
+      font-size: 2rem;
+      color: #ffffff;
+      margin: 10px 0;
+      cursor: pointer;
+      transition: 0.3s;
+      text-shadow: 0 0 6px #0074D9;
+    }
+
+    .sidebar button:hover {
+      color: #ffdc00;
+    }
+
+    .sidebar-info {
+      margin-top: 10px;
+      font-size: 1rem;
+      color: white;
+      text-shadow: 0 0 5px #0074D9;
+    }
+
+    .footer {
+      position: fixed;
+      bottom: 10px;
+      right: 15px;
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.8);
+      text-shadow: 0 0 5px #0074D9;
+    }
+
+
+    .ai-container {
+      width: 100%;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      position: relative;
+    }
+    
+    .chat-container {
+      flex-grow: 1;
+      overflow-y: auto;
+      background: rgba(25, 25, 25, 0.7);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 15px;
+      box-shadow: 
+        0 0 10px rgba(0, 116, 217, 0.5),
+        0 0 20px rgba(0, 116, 217, 0.3);
+      min-height: 200px;
+      border: 1px solid rgba(0, 116, 217, 0.2);
+    }
+    
+    .message {
+      display: flex;
+      margin-bottom: 15px;
+      max-width: 80%;
+      position: relative;
+    }
+    
+    .message.user {
+      margin-left: auto;
+      justify-content: flex-end;
+    }
+    
+    .message.ai {
+      margin-right: auto;
+      justify-content: flex-start;
+    }
+    
+    .bubble {
+      padding: 12px 16px;
+      border-radius: 12px;
+      line-height: 1.5;
+      font-size: 0.95rem;
+      position: relative;
+      word-wrap: break-word;
+    }
+    
+    .user .bubble {
+      background-color: rgba(0, 116, 217, 0.3);
+      border-bottom-right-radius: 4px;
+      border: 1px solid rgba(0, 116, 217, 0.3);
+      box-shadow: 0 0 8px rgba(0, 116, 217, 0.3);
+    }
+    
+    .ai .bubble {
+      background-color: rgba(255, 65, 54, 0.3);
+      border-bottom-left-radius: 4px;
+      border: 1px solid rgba(255, 65, 54, 0.2);
+    }
+    
+    .bubble pre {
+      background-color: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      padding: 12px;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      margin: 8px 0;
+      border: 1px solid rgba(0, 116, 217, 0.2);
+    }
+    
+    .bubble code {
+      font-family: 'JetBrains Mono', monospace;
+      background-color: rgba(0, 0, 0, 0.3);
+      padding: 2px 4px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      border: 1px solid rgba(0, 116, 217, 0.2);
+    }
+    
+    .input-container {
+      padding: 5px;
+      position: relative;
+      margin-bottom: 5px;
+      background-color: rgba(25, 25, 25, 0.8);
+      border-radius: 12px;
+      border: 1px solid rgba(0, 116, 217, 0.3);
+      min-height: 70px;
+      box-shadow: 
+        0 0 10px rgba(0, 116, 217, 0.5),
+        0 0 20px rgba(0, 116, 217, 0.3);
+    }
+    
+    .input-container textarea {
+      width: 100%;
+      background-color: transparent;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 60px 12px 16px;
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.95rem;
+      resize: none;
+      min-height: 56px;
+      max-height: 200px;
+      outline: none;
+    }
+    
+   
+    .input-container textarea:focus {
+      box-shadow: none;
+    }
+    
+    .input-container button {
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      background: #0074D9;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 0 8px rgba(0, 116, 217, 0.5);
+    }
+    
+    .input-container button:hover {
+      background: #ff4136;
+      transform: translateY(-2px);
+    }
+    
+    .input-container button:disabled {
+      background: #2d3748;
+      cursor: not-allowed;
+      opacity: 0.7;
+      box-shadow: none;
+    }
+    
+    .typing-indicator {
+      display: flex;
+      padding: 12px 16px;
+      background-color: rgba(255, 65, 54, 0.3);
+      border-radius: 12px;
+      margin-bottom: 15px;
+      width: fit-content;
+      border-bottom-left-radius: 4px;
+      border: 1px solid rgba(255, 65, 54, 0.2);
+    }
+    
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #ff4136;
+      border-radius: 50%;
+      margin: 0 2px;
+      animation: typingAnimation 1.4s infinite ease-in-out;
+    }
+    
+    .typing-dot:nth-child(1) {
+      animation-delay: 0s;
+    }
+    
+    .typing-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    
+    .typing-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+    
+    @keyframes typingAnimation {
+      0%, 60%, 100% {
+        transform: translateY(0);
+      }
+      30% {
+        transform: translateY(-5px);
+      }
+    }
+    
+    .terms-notice {
+      font-size: 0.8rem;
+      margin-top: 5px;
+      opacity: 0.8;
+      text-align: center;
+      padding: 0 10px;
+      text-shadow: 0 0 5px rgba(0, 116, 217, 0.5);
+    }
+    
+    .terms-notice a {
+      color: #ffdc00;
+      text-decoration: none;
+      transition: 0.2s;
+    }
+    
+    .terms-notice a:hover {
+      text-shadow: 0 0 5px #ffdc00;
+    }
+    
+    .message-actions {
+      display: none;
+      gap: 5px;
+      margin-top: 5px;
+      justify-content: flex-end;
+    }
+    
+    .user .message-actions {
+      justify-content: flex-end;
+    }
+    
+    .ai .message-actions {
+      justify-content: flex-start;
+    }
+    
+    .message:hover .message-actions {
+      display: flex;
+    }
+    
+    .action-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(0, 116, 217, 0.1);
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 0 5px rgba(0, 116, 217, 0.3);
+    }
+    
+    .action-btn:hover {
+      background-color: rgba(0, 116, 217, 0.3);
+      transform: scale(1.1);
+      box-shadow: 0 0 8px rgba(0, 116, 217, 0.5);
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        width: 95%;
+        height: calc(100vh - 100px);
+        margin: 10px auto;
+      }
+      
+      .title {
+        font-size: 2.5rem;
+      }
+      
+      .sidebar {
+        display: none;
+      }
+      
+      .input-container {
+        min-height: 60px;
+      }
+      
+      .message {
+        max-width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+  
+  <div class="sidebar">
+    <button onclick="window.location.href='index.html';">🏠</button>
+    <button onclick="window.location.href='games.html';">🎮</button>
+    <button onclick="window.location.href='movies.html';">🎬</button>
+    <button onclick="window.location.href='tidechat.html';">💬</button>
+    <button onclick="window.location.href='credits.html';">📝</button>
+    <div class="sidebar-info">
+      <span id="battery">⚡</span>
+      <span id="time">⌚</span>
+    </div>
+  </div>
+  <div class="container">
+    <h9 class="title">Tide AI</h9>
+
+    
+    <div class="ai-container">
+      <div class="chat-container" id="chat-box">
+        <div class="message ai">
+          <div class="bubble">Welcome to Tide AI! How can I assist you today? 🌊</div>
+          <div class="message-actions">
+            <button class="action-btn copy-btn" title="Copy">
+              <i class="bi bi-clipboard"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="input-container">
+        <textarea id="user-input" placeholder="Message Tide AI..." autocomplete="off" rows="1"></textarea>
+        <button id="send-btn">
+          <i class="bi bi-send-fill"></i>
+        </button>
+      </div>
+      <div class="terms-notice">
+        By messaging Tide AI, you agree to the <a href="/termsofuse">Terms of Use</a> and <a href="/tidepolicy">Privacy Policy</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">Tide AI | By MK</div>
+
+  <script>
+   
+    const API_KEY = "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";
+    const MODEL = "llama3-8b-8192";
+    
+
+    const chatBox = document.getElementById("chat-box");
+    const userInput = document.getElementById("user-input");
+    const sendButton = document.getElementById("send-btn");
+    
+   
+    navigator.getBattery().then(battery => {
+      function updateBattery() {
+        document.getElementById("battery").textContent = `${Math.round(battery.level * 100)}% ⚡`;
+      }
+      updateBattery();
+      battery.addEventListener("levelchange", updateBattery);
+    });
+
+    function updateTime() {
+      const now = new Date();
+      document.getElementById("time").textContent = now.toLocaleTimeString();
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
+
+ 
+    function renderMarkdown(text) {
+ 
+      text = text.replace(/```([\s\S]*?)```/g, function(match, code) {
+        return `<pre><code>${DOMPurify.sanitize(code.replace(/</g, "&lt;").replace(/>/g, "&gt;"))}</code></pre>`;
+      });
+
+    
+      text = text.replace(/`(.*?)`/g, function(match, code) {
+        return `<code>${DOMPurify.sanitize(code.replace(/</g, "&lt;").replace(/>/g, "&gt;"))}</code>`;
+      });
+
+  
+      text = text
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+        .replace(/\*(.*?)\*/g, "<em>$1</em>");
+
+   
+      text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+
+      return DOMPurify.sanitize(text);
+    }
+
+  
+    function displayMessage(text, sender, isHTML = false) {
+      const messageDiv = document.createElement("div");
+      messageDiv.classList.add("message", sender);
+
+      const bubbleDiv = document.createElement("div");
+      bubbleDiv.classList.add("bubble");
+
+      if (isHTML) {
+        bubbleDiv.innerHTML = text;
+      } else {
+        bubbleDiv.textContent = text;
+      }
+
+      messageDiv.appendChild(bubbleDiv);
+      chatBox.appendChild(messageDiv);
+
+    
+      const actionsDiv = document.createElement('div');
+      actionsDiv.className = 'message-actions';
+      
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 'action-btn copy-btn';
+      copyBtn.title = 'Copy';
+      copyBtn.innerHTML = '<i class="bi bi-clipboard"></i>';
+      copyBtn.addEventListener('click', () => copyToClipboard(bubbleDiv));
+      actionsDiv.appendChild(copyBtn);
+      
+      messageDiv.appendChild(actionsDiv);
+
+      chatBox.scrollTop = chatBox.scrollHeight;
+      return messageDiv;
+    }
+
+ 
+    function displayTypingIndicator() {
+      const messageDiv = document.createElement("div");
+      messageDiv.classList.add("message", "ai");
+      
+      const typingDiv = document.createElement("div");
+      typingDiv.classList.add("typing-indicator");
+      
+      for (let i = 0; i < 3; i++) {
+        const dot = document.createElement("div");
+        dot.classList.add("typing-dot");
+        typingDiv.appendChild(dot);
+      }
+      
+      messageDiv.appendChild(typingDiv);
+      chatBox.appendChild(messageDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      
+      return messageDiv;
+    }
+
+   
+    function copyToClipboard(element) {
+      const text = element.textContent || element.innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const copyBtns = document.querySelectorAll('.copy-btn');
+        copyBtns.forEach(btn => {
+          btn.innerHTML = '<i class="bi bi-clipboard"></i>';
+          btn.style.color = '';
+        });
+        
+        const currentBtn = element.parentElement.querySelector('.copy-btn');
+        if (currentBtn) {
+          currentBtn.innerHTML = '<i class="bi bi-check"></i>';
+          currentBtn.style.color = '#4ade80';
+          setTimeout(() => {
+            currentBtn.innerHTML = '<i class="bi bi-clipboard"></i>';
+            currentBtn.style.color = '';
+          }, 2000);
+        }
+      });
+    }
+
+
+    async function sendMessage() {
+      const userMessage = userInput.value.trim();
+      if (!userMessage) return;
+
+
+      displayMessage(userMessage, "user");
+      userInput.value = "";
+      sendButton.disabled = true;
+
+
+      const loadingMessage = displayTypingIndicator();
+
+      try {
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${API_KEY}`
+          },
+          body: JSON.stringify({
+            model: MODEL,
+            messages: [{ role: "user", content: userMessage }],
+            temperature: 0.7,
+            max_tokens: 2048
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`API request failed with status ${response.status}`);
+        }
+
+        const data = await response.json();
+        let aiMessage = data.choices?.[0]?.message?.content || "Sorry, I couldn't understand that.";
+
+ 
+        chatBox.removeChild(loadingMessage);
+        displayMessage(renderMarkdown(aiMessage), "ai", true);
+        
+      } catch (error) {
+        console.error("Error:", error);
+        chatBox.removeChild(loadingMessage);
+        displayMessage("Error communicating with AI. Please try again.", "ai");
+      } finally {
+        sendButton.disabled = false;
+      }
+    }
+
+
+    sendButton.addEventListener("click", sendMessage);
+
+    userInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+      }
+      
+
+      if (event.key === "Enter" || event.key === "Backspace") {
+        userInput.style.height = 'auto';
+        userInput.style.height = (userInput.scrollHeight) + 'px';
+      }
+    });
+
+    userInput.addEventListener("input", () => {
+      userInput.style.height = 'auto';
+      userInput.style.height = (userInput.scrollHeight) + 'px';
+    });
+
+ 
+    userInput.style.height = 'auto';
+    userInput.style.height = (userInput.scrollHeight) + 'px';
+  </script>
+</body>
+</html>
