@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apps</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+</head>
+<body>
+  <header>
+    <h1>Apps Hub</h1>
+  </header>
+
+  <main class="apps-grid">
+    <button onclick="window.open('https://tide-tau.vercel.app/active/go/hvtrs8%2F-wuw%2Cymuvu%60e%2Ccmm-', '_blank')">
+      <i class="bi bi-youtube"></i>
+      <span>YouTube</span>
+    </button>
+
+    <button onclick="window.open('https://tide-tau.vercel.app/active/go/hvtrs8%2F-wuw%2Ctkkvoi.aoo%2F', '_blank')">
+      <i class="bi bi-tiktok"></i>
+      <span>TikTok</span>
+    </button>
+
+    <button onclick="window.open('https://tide-tau.vercel.app/active/go/hvtrs8%2F-dksaopd%2Ccmm-', '_blank')">
+      <i class="bi bi-discord"></i>
+      <span>Discord</span>
+    </button>
+
+    <button onclick="window.open('https://tide-tau.vercel.app/active/go/hvtrs8%2F-x%2Ccmm-', '_blank')">
+      <i class="bi bi-twitter"></i>
+      <span>Twitter</span>
+    </button>
+
+    <!-- Add more apps here -->
+  </main>
+
+  <style>
+    body {
+      font-family: sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    h1 {
+      margin-bottom: 2rem;
+    }
+
+    .apps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 1.5rem;
+      width: 100%;
+      max-width: 800px;
+    }
+
+    .apps-grid button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      background: var(--button-bg, #333);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .apps-grid button:hover {
+      transform: translateY(-3px);
+      background: var(--button-hover-bg, #555);
+    }
+
+    .apps-grid i {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .apps-grid span {
+      font-size: 0.9rem;
+      text-align: center;
+    }
+  </style>
+</body>
+</html>
