@@ -1,3 +1,4 @@
+<script>
   function runStealthMode() {
     const title = "Google";
     const icon = "https://www.google.com/favicon.ico";
@@ -21,6 +22,7 @@
               padding: 0;
               height: 100%;
               overflow: hidden;
+              background: #fff;
             }
             iframe {
               width: 100%;
@@ -30,51 +32,34 @@
           </style>
         </head>
         <body>
-          <iframe src="${src}"></iframe>
+          <iframe src="${src}" allowfullscreen></iframe>
         </body>
       </html>
     `);
     popup.document.close();
 
+    // Redirect the current window back to Google
     window.location.href = "https://www.google.com";
   }
 
-  window.onload = function () {
-    document.getElementById('loader').style.display = 'none';
-    document.getElementById('content').style.display = 'block';
-
+  window.addEventListener("load", () => {
     const stealth = JSON.parse(localStorage.getItem("stealthModeEnabled")) || false;
     const checkbox = document.getElementById("blankMode");
-    checkbox.checked = stealth;
+    if (checkbox) {
+      checkbox.checked = stealth;
 
-    if (stealth) runStealthMode();
+      if (stealth) runStealthMode();
 
-    checkbox.addEventListener("change", function () {
-      const isChecked = checkbox.checked;
-      localStorage.setItem("stealthModeEnabled", JSON.stringify(isChecked));
-      if (isChecked) runStealthMode();
-    });
-  };
-
-  document.querySelectorAll('a').forEach(function (link) {
-    link.addEventListener('click', function () {
-      var gameName = link.textContent;
-      console.log("Loading " + gameName + "...");
-
-      document.getElementById('loader').style.display = 'block';
-      document.getElementById('content').style.display = 'none';
-
-      var iframe = document.getElementById('gameFrame');
-      if (iframe) {
-        iframe.onload = function () {
-          document.getElementById('loader').style.display = 'none';
-          document.getElementById('content').style.display = 'block';
-        };
-      }
-    });
+      checkbox.addEventListener("change", function () {
+        const isChecked = checkbox.checked;
+        localStorage.setItem("stealthModeEnabled", JSON.stringify(isChecked));
+        if (isChecked) runStealthMode();
+      });
+    }
   });
 
-  document.getElementById('searchForm').addEventListener('submit', async function (e) {
+  // Example: search form that proxies queries through Ultraviolet
+  document.getElementById('searchForm')?.addEventListener('submit', async function (e) {
     e.preventDefault();
     let query = document.getElementById('urlInput').value.trim();
     if (!query) return;
@@ -82,9 +67,6 @@
     const rawUrl = generateSearchUrl(query);
     const encoded = __uv$config.encodeUrl(rawUrl);
     const proxyUrl = __uv$config.prefix + encoded;
-
-    document.getElementById('loader').style.display = 'block';
-    document.getElementById('content').style.display = 'none';
 
     window.location.href = proxyUrl;
   });
@@ -101,3 +83,4 @@
     }
     return `https://duckduckgo.com/search?q=${encodeURIComponent(query)}&source=web`;
   }
+</script>
