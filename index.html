@@ -6,9 +6,11 @@
   <title>Tide</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 <body>
+  <!-- Red & Blue Bubble Background -->
   <div class="bubbles">
     <div></div><div></div><div></div><div></div><div></div>
   </div>
@@ -16,6 +18,7 @@
   <div id="mainContent">
     <div id="loader" class="loader" style="display:none;">Loading...</div>
 
+    <!-- Center Logo + Input -->
     <div class="container" id="content">
       <h1 class="title">Tide<span class="dot">.</span></h1>
 
@@ -28,36 +31,37 @@
       </form>
     </div>
 
+    <!-- Frosted Sidebar -->
     <div class="sidebar">
       <button onclick="window.location.href='games.html';"><i class="bi bi-joystick"></i></button>
       <button onclick="window.location.href='movies.html';"><i class="bi bi-film"></i></button>
       <button onclick="window.location.href='tidechat.html';"><i class="bi bi-chat-dots"></i></button>
       <button onclick="window.location.href='credits.html';"><i class="bi bi-info-circle"></i></button>
       <button onclick="window.location.href='apps.html';"><i class="bi bi-wrench"></i></button>
+
       <div class="sidebar-info">
         <span id="battery">⚡</span>
         <span id="time">⌚</span>
       </div>
     </div>
 
-    <div class="footer">Tide | By Mizzery</div>
+    <!-- Footer -->
+    <div class="footer">Tide | Dual Current Update 🌊</div>
   </div>
 
+  <!-- Scripts -->
   <script src="/active/uv/uv.bundle.js" defer></script>
   <script src="/active/uv/uv.config.js" defer></script>
   <script src="/assets/js/register.js" defer></script>
   <script src="/assets/js/index.js" defer></script>
+
   <script>
-    // Removed password modal code completely
-
     window.onload = function() {
-      // Show main content immediately
-      const loader = document.getElementById('loader');
-      const content = document.getElementById('content');
-      loader.style.display = 'none';
-      content.style.display = 'block';
+      // Hide loader
+      document.getElementById('loader').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
 
-      // Battery status
+      // Battery indicator
       if (navigator.getBattery) {
         navigator.getBattery().then(battery => {
           function updateBattery() {
@@ -68,10 +72,10 @@
         });
       }
 
-      // Time update every second
+      // Time updater
       function updateTime() {
         const now = new Date();
-        document.getElementById("time").textContent = now.toLocaleTimeString();
+        document.getElementById("time").textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       }
       setInterval(updateTime, 1000);
       updateTime();
