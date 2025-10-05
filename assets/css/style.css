@@ -1,11 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;800&display=swap');
 
 body {
   margin: 0;
   padding: 0;
-  background: radial-gradient(ellipse at center, #002c4a 0%, #000914 100%);
-  background-size: 200% 200%;
-  animation: waterPulse 8s ease-in-out infinite;
+  background: linear-gradient(135deg, #ff4e5b 0%, #00b8d4 100%);
+  background-size: 400% 400%;
+  animation: dualFlow 10s ease-in-out infinite;
   color: #fff;
   font-family: 'Poppins', sans-serif;
   height: 100vh;
@@ -15,35 +15,50 @@ body {
   overflow: hidden;
 }
 
+/* 3D Logo Container */
 .container {
   text-align: center;
   animation: fadeIn 2s ease forwards, floaty 6s ease-in-out infinite;
+  z-index: 10;
 }
 
 .title {
-  font-size: 4rem;
-  font-weight: 700;
-  text-shadow: 0 0 10px #00ffe7, 0 0 20px #00d4ff, 0 0 30px #0088ff;
+  font-size: 5rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #fff;
+  text-shadow:
+    2px 2px 0 #ff4e5b,
+    4px 4px 0 #00b8d4,
+    0 0 20px rgba(255,255,255,0.8),
+    0 0 40px rgba(0,184,212,0.5);
+  transform: perspective(400px) rotateX(5deg) rotateY(-5deg);
+  transition: transform 0.8s ease, text-shadow 0.4s;
 }
 
-.dot {
-  color: #00ffe7;
-  text-shadow: 0 0 8px #00ffe7;
+.title:hover {
+  transform: perspective(400px) rotateX(0deg) rotateY(0deg) scale(1.05);
+  text-shadow:
+    0 0 20px #ff4e5b,
+    0 0 40px #00b8d4,
+    0 0 60px #ffffff;
 }
 
+/* Sidebar updated with red/blue accents */
 .sidebar {
   position: fixed;
   left: 10px;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(0, 25, 40, 0.85);
+  background: rgba(10, 10, 20, 0.7);
   padding: 10px;
   width: 60px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
   display: flex;
   flex-direction: column;
   align-items: center;
+  backdrop-filter: blur(8px);
 }
 
 .sidebar button {
@@ -54,37 +69,31 @@ body {
   margin: 10px 0;
   cursor: pointer;
   transition: 0.3s;
-  text-shadow: 0 0 8px #00ffe7;
+  text-shadow: 0 0 8px #00b8d4;
 }
 
 .sidebar button:hover {
-  color: #00bfff;
-  text-shadow: 0 0 10px #00ffe7;
+  color: #ff4e5b;
+  text-shadow: 0 0 10px #ff4e5b, 0 0 20px #00b8d4;
 }
 
-.sidebar-info {
-  margin-top: 10px;
-  font-size: 1rem;
-  color: white;
-  text-shadow: 0 0 5px #00d4ff;
-}
-
+/* Input + Buttons */
 input[type="text"] {
   padding: 12px;
   width: 300px;
   border: none;
   border-radius: 25px;
-  background: rgba(25, 35, 45, 0.85);
+  background: rgba(15, 25, 35, 0.85);
   color: white;
   font-size: 1rem;
   outline: none;
   transition: 0.3s;
-  box-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
 input[type="text"]:focus {
-  background: rgba(35, 45, 55, 0.95);
-  box-shadow: 0 0 12px rgba(0, 255, 255, 0.8);
+  background: rgba(25, 35, 45, 0.95);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
 }
 
 button {
@@ -93,7 +102,7 @@ button {
   font-size: 1rem;
   border: none;
   border-radius: 25px;
-  background: linear-gradient(135deg, #00d4ff, #0074ff);
+  background: linear-gradient(135deg, #ff4e5b, #00b8d4);
   color: white;
   cursor: pointer;
   transition: 0.3s;
@@ -101,19 +110,21 @@ button {
 }
 
 button:hover {
-  background: linear-gradient(135deg, #0088ff, #00ffe7);
-  box-shadow: 0 0 10px #00ffe7;
+  background: linear-gradient(135deg, #00b8d4, #ff4e5b);
+  box-shadow: 0 0 15px #ffffff;
 }
 
+/* Footer */
 .footer {
   position: fixed;
   bottom: 10px;
   right: 15px;
   font-size: 0.9rem;
   color: rgba(255, 255, 255, 0.8);
-  text-shadow: 0 0 5px #00d4ff;
+  text-shadow: 0 0 5px #00b8d4;
 }
 
+/* Red & Blue bubbles */
 .bubbles {
   position: fixed;
   top: 0; left: 0;
@@ -126,20 +137,26 @@ button:hover {
   position: absolute;
   bottom: -100px;
   width: 20px; height: 20px;
-  background: rgba(0, 255, 255, 0.2);
   border-radius: 50%;
-  animation: rise 10s infinite ease-in;
+  animation: rise 12s infinite ease-in;
+  opacity: 0.5;
 }
-.bubbles div:nth-child(1) { left: 10%; animation-delay: 0s; }
-.bubbles div:nth-child(2) { left: 30%; animation-delay: 2s; }
-.bubbles div:nth-child(3) { left: 50%; animation-delay: 4s; }
-.bubbles div:nth-child(4) { left: 70%; animation-delay: 1s; }
-.bubbles div:nth-child(5) { left: 90%; animation-delay: 3s; }
+.bubbles div:nth-child(odd) {
+  background: rgba(255, 78, 91, 0.3);
+}
+.bubbles div:nth-child(even) {
+  background: rgba(0, 184, 212, 0.3);
+}
+
+@keyframes dualFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
 
 @keyframes wave {
-  0% { transform: translateY(0); }
+  0%,100% { transform: translateY(0); }
   50% { transform: translateY(-5px); }
-  100% { transform: translateY(0); }
 }
 
 @keyframes fadeIn {
@@ -150,12 +167,6 @@ button:hover {
 @keyframes floaty {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
-}
-
-@keyframes waterPulse {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
 }
 
 @keyframes rise {
