@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Task Force: Eclipse — by Mizzery</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #11192e;
+      --accent: #3bd1ff;
+      --accent-2: #7cff6b;
+      --danger: #ff5c5c;
+      --text: #e6f0ff;
+      --muted: #93a4c1;
+    }
+    html, body { margin: 0; height: 100%; background: radial-gradient(1000px 600px at 70% 30%, #0f1731, var(--bg)); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; color: var(--text); overflow: hidden; }
+    .hud { position: fixed; inset: 0; pointer-events: none; }
+    .panel { position: absolute; left: 16px; top: 16px; background: #0f1935aa; border: 1px solid #2a355b; border-radius: 12px; padding: 10px 12px; backdrop-filter: blur(4px); font-size: 12px; color: var(--muted); }
+    .panel h3 { margin: 0 0 6px 0; color: var(--text); font-size: 13px; letter-spacing: .08em; text-transform: uppercase }
+    .panel .row { display: grid; grid-template-columns: auto 1fr; gap: 8px 12px; align-items: center }
+    .bar { height: 6px; background: #1a2240; border-radius: 999px; overflow: hidden; box-shadow: inset 0 0 0 1px #2a355b; }
+    .bar > span { display: block; height: 100% }
+    .hp { background: linear-gradient(90deg, #38ef7d, #3a86ff); }
+    .noise { background: linear-gradient(90deg, #ffb703, #fb8500); }
+
+    /* Menu overlay must sit above HUD/canvas and be clickable */
+    .center { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; background: radial-gradient(1000px 700px at 50% -10%, #16224a, transparent); pointer-events: auto; }
+    .card { width: min(820px, 92vw); background: #0f1935e6; border: 1px solid #304071; border-radius: 18px; padding: 22px; box-shadow: 0 10px 40px #00000088; }
+    .title { font-weight: 800; font-size: clamp(24px, 2.4vw + 16px, 42px); letter-spacing: .06em; text-transform: uppercase; margin: 0 0 8px; }
+    .subtitle { color: var(--muted); margin: 0 0 18px; }
+    .btns { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+    button { pointer-events: auto; cursor: pointer; border: 1px solid #41508a; background: linear-gradient(180deg, #18234a, #0f1a36); color: var(--text); padding: 10px 14px; border-radius: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; transition: transform .08s ease, box-shadow .2s ease; }
+    button:hover { box-shadow: 0 0 0 1px #5a75bf, 0 10px 30px #0006; }
+    button:active { transform: translateY(1px) scale(.99); }
+
+    .toast { position: absolute; right: 16px; bottom: 16px; background: #0f1935e6; border: 1px solid #304071; padding: 10px 12px; border-radius: 12px; font-size: 12px; color: var(--muted); pointer-events: none; }
+    a { color: var(--accent); text-decoration: none }
+
+    #gameWrap { position: fixed; inset: 0; display: grid; place-items: center; }
+    canvas { box-shadow: 0 10px 50px #0008; border-radius: 14px; border: 1px solid #273663; background: #0a0f20; }
+
+    .minimap { position: absolute; right: 16px; top: 16px; background: #0f1935aa; border: 1px solid #2a355b; border-radius: 10px; padding: 6px; width: 140px; height: 140px; }
+
+    .legend { position: absolute; left: 16px; bottom: 16px; font-size: 12px; color: var(--muted); background: #0f1935cc; border: 1px solid #2a355b; border-radius: 10px; padding: 8px 10px; }
+    .legend code { color: var(--text); background: #0b1230; border-radius: 6px; padding: 2px 6px; border: 1px solid #1f2a55; }
+
+    .extract { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); background: #0f1935e6; border: 1px solid #304071; border-radius: 12px; padding: 8px 12px; font-size: 12px; color: var(--muted); display: none; }
+
+    /* z-index layering */
+    #menu { z-index: 50; }
+    #mpModal { z-index: 60; }
+    #optModal { z-index: 58; }
+
+    /* Click layering – keep canvas under overlays */
+    #gameWrap { position: fixed; inset: 0; z-index: 0; }
+    .hud { z-index: 5; pointer-events: none; }
+    #menu { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; pointer-events: auto; }
+    #mpModal { z-index: 60; }
+  </style>
+</head>
+<body>
+  <div id="gameWrap">
+    <canvas id="game" width="1000" height="600" tabindex="0"></canvas>
+  </div>
+
+  <div class="hud">
+    <div class="panel" style="min-width:260px">
+      <h3>Task Force: Eclipse</h3>
+      <div class="row"><div>Health</div><div class="bar"><span id="hpBar" class="hp" style="width:100%"></span></div></div>
+      <div class="row"><div>Noise</div><div class="bar"><span id="noiseBar" class="noise" style="width:0%"></span></div></div>
+      <div class="row"><div>Intel</div><div id="intelText">0 / 1</div></div>
+      <div class="row"><div>Enemies</div><div id="enemyText">–</div></div>
+      <div class="row"><div>Weapon</div><div id="weaponText">–</div></div>
+      <div class="row"><div>Ammo</div><div id="ammoText">–</div></div>
+      <div class="row"><div>Reload</div><div class="bar"><span id="reloadBar" style="width:0%"></span></div></div>
+    </div>
+
+    <div class="minimap"><canvas id="mini" width="128" height="128"></canvas></div>
+    <div class="legend">Controls: <code>WASD</code> move · <code>Mouse</code> aim · <code>LMB</code> shoot · <code>E</code> interact · Controller supported (sticks + RT + A)</div>
+    <div id="extractMsg" class="extract">Extraction available! Reach the green zone.</div>
+
+    <!-- Menu outside HUD -->
+    <div id="menu" class="center">
+      <div class="card">
+        <h1 class="title">Task Force: Eclipse</h1>
+        <h2 class="subtitle">By Mizzery</h2>
+        <p class="subtitle">Top-down tactical raid. Secure the <strong>Intel Drive</strong>, avoid patrols, and extract alive. Enemies adapt to your noise and tactics.</p>
+        <div class="btns">
+          <button id="startBtn" onclick="__startGame()">New Operation</button>
+          <button id="mpBtn"   onclick="__openMP()">Multiplayer (P2P)</button>
+          <button id="optBtn"  onclick="__openOpts()">Options</button>
+          <button id="howBtn">How to Play</button>
+          <button id="gpBtn">Detect Controller</button>
+        </div>
+        <p style="margin-top:12px; color:var(--muted); font-size:12px">Beta v0.1 © Mizzery 2025.</p>
+      </div>
+    </div>
+
+    <div id="toast" class="toast" style="display:none"></div>
+  </div>
+
+  <!-- ===== Multiplayer Modal (Manual WebRTC) ===== -->
+  <div id="mpModal" style="display:none; position:fixed; inset:0; background:#0008; backdrop-filter: blur(2px);">
+    <div style="position:absolute; left:50%; top:50%; transform: translate(-50%,-50%); width:min(900px,92vw); background:#0f1935f0; border:1px solid #2a3f77; border-radius:16px; padding:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:8px">
+        <h2 style="margin:0; font-size:16px; letter-spacing:.08em; text-transform:uppercase">Multiplayer (P2P) — Manual Signaling</h2>
+        <button id="mpClose" class="btn">Close</button>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px">
+        <div style="border:1px solid #2a3f77; border-radius:12px; padding:12px">
+          <h3 style="margin:0 0 8px; font-size:13px; text-transform:uppercase; letter-spacing:.06em">Host</h3>
+          <ol style="margin:0 0 8px 18px; color:#9fb2db">
+            <li>Click <strong>Create Offer</strong> then <strong>Copy Offer</strong>.</li>
+            <li>Send it to your friend (DM/Discord).</li>
+            <li>Paste their <em>Answer</em> below and press <strong>Connect</strong>.</li>
+          </ol>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:6px">
+            <button id="hostCreate" class="btn">Create Offer</button>
+            <button id="hostCopy" class="btn">Copy Offer</button>
+          </div>
+          <textarea id="hostOffer" placeholder="Host Offer (auto-filled)" style="width:100%; height:120px; background:#0b1230; color:#e6f0ff; border:1px solid #253a73; border-radius:8px; padding:8px"></textarea>
+          <div style="height:8px"></div>
+          <textarea id="hostAnswer" placeholder="Paste Client Answer here" style="width:100%; height:120px; background:#0b1230; color:#e6f0ff; border:1px solid #253a73; border-radius:8px; padding:8px"></textarea>
+          <div style="height:8px"></div>
+          <button id="hostConnect" class="btn play"><span class="dot"></span> Connect</button>
+        </div>
+        <div style="border:1px solid #2a3f77; border-radius:12px; padding:12px">
+          <h3 style="margin:0 0 8px; font-size:13px; text-transform:uppercase; letter-spacing:.06em">Join</h3>
+          <ol style="margin:0 0 8px 18px; color:#9fb2db">
+            <li>Paste the host's <em>Offer</em> below and click <strong>Create Answer</strong>.</li>
+            <li>Copy your <em>Answer</em> and send it back to the host.</li>
+          </ol>
+          <textarea id="joinOffer" placeholder="Paste Host Offer here" style="width:100%; height:120px; background:#0b1230; color:#e6f0ff; border:1px solid #253a73; border-radius:8px; padding:8px"></textarea>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; margin:8px 0">
+            <button id="joinCreate" class="btn">Create Answer</button>
+            <button id="joinCopy" class="btn">Copy Answer</button>
+          </div>
+          <textarea id="joinAnswer" placeholder="Client Answer (auto-filled)" style="width:100%; height:120px; background:#0b1230; color:#e6f0ff; border:1px solid #253a73; border-radius:8px; padding:8px"></textarea>
+        </div>
+      </div>
+      <p style="margin:10px 0 0; color:#9fb2db; font-size:12px">Tip: This uses public STUN only. Some networks may block P2P connections without TURN.</p>
+    </div>
+  </div>
+
+  <!-- ===== Options Modal (CORRECT PLACE: outside <script>) ===== -->
+  <div id="optModal" style="display:none; position:fixed; inset:0; background:#0008; backdrop-filter: blur(2px); z-index:58;">
+    <div style="position:absolute; left:50%; top:50%; transform: translate(-50%,-50%); width:min(720px,92vw); background:#0f1935f0; border:1px solid #2a3f77; border-radius:16px; padding:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:8px">
+        <h2 style="margin:0; font-size:16px; letter-spacing:.08em; text-transform:uppercase">Options</h2>
+        <button id="optClose" class="btn" onclick="__optsClose()">Close</button>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px">
+        <div style="border:1px solid #2a3f77; border-radius:12px; padding:12px">
+          <h3 style="margin:0 0 8px; font-size:13px; text-transform:uppercase; letter-spacing:.06em">Difficulty</h3>
+          <label style="display:block; margin:6px 0; color:#9fb2db">
+            Enemy Difficulty
+            <select id="optDifficulty" style="width:100%; margin-top:6px; background:#0b1230; color:#e6f0ff; border:1px solid #253a73; border-radius:8px; padding:8px">
+              <option>Easy</option>
+              <option selected>Normal</option>
+              <option>Hard</option>
+            </select>
+          </label>
+        </div>
+
+        <div style="border:1px solid #2a3f77; border-radius:12px; padding:12px">
+          <h3 style="margin:0 0 8px; font-size:13px; text-transform:uppercase; letter-spacing:.06em">Objectives</h3>
+          <label style="display:block; margin:6px 0; color:#9fb2db">
+            Intel Drives
+            <select id="optIntel" style="width:100%; margin-top:6px; background:#0b1230; color:#e6f0ff; border:1px solid #253a73; border-radius:8px; padding:8px">
+              <option value="1" selected>1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+            </select>
+          </label>
+        </div>
+
+        <div style="border:1px solid #2a3f77; border-radius:12px; padding:12px">
+          <h3 style="margin:0 0 8px; font-size:13px; text-transform:uppercase; letter-spacing:.06em">Map</h3>
+          <label style="display:block; margin:6px 0; color:#9fb2db">
+            Map Size
+            <select id="optMap" style="width:100%; margin-top:6px; background:#0b1230; color:#e6f0ff; border:1px solid #253a73; border-radius:8px; padding:8px">
+              <option>Small</option>
+              <option selected>Standard</option>
+              <option>Large</option>
+            </select>
+          </label>
+        </div>
+
+        <div style="border:1px dashed #31509d; border-radius:12px; padding:12px; color:#a9bee8">
+          Changes apply to the <strong>next</strong> New Operation. Click <strong>Save</strong> then <strong>New Operation</strong>.
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:12px">
+        <button class="btn" onclick="__optsSave()">Save</button>
+        <button class="btn" onclick="__optsClose()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SCRIPT AFTER ALL DOM (so bindings never see nulls) ====== -->
+  <script>
+  ;(() => {
+    // ================== SAFETY: GLOBAL ERROR TOAST ==================
+    window.addEventListener('error', (e)=>{
+      const el = document.getElementById('toast');
+      if (!el) return;
+      el.textContent = 'JS Error: ' + (e.message||'unknown');
+      el.style.display = 'block';
+      clearTimeout(el._t);
+      el._t = setTimeout(()=> el.style.display='none', 5000);
+    });
+
+    const TAU = Math.PI * 2;
+
+    // ================== UTILITIES ==================
+    const rand = (a,b) => a + Math.random()*(b-a);
+    const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+    const dist = (a,b) => Math.hypot(a.x-b.x, a.y-b.y);
+    const lineOfSight = (from, to, walls) => {
+      const steps = 20; const dx = (to.x - from.x)/steps; const dy = (to.y - from.y)/steps;
+      let x = from.x, y = from.y;
+      for (let i=0;i<steps;i++){ x += dx; y += dy; for (const w of walls){ if (x> w.x && x< w.x+w.w && y> w.y && y< w.y+w.h) return false; } }
+      return true;
+    };
+
+    // ================== PROC-GEN HELPERS ==================
+    function makeRNG(seed){
+      // Mulberry32
+      let t = seed >>> 0;
+      return function(){
+        t += 0x6D2B79F5;
+        let r = Math.imul(t ^ (t >>> 15), 1 | t);
+        r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
+        return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+      }
+    }
+    function randi(rng, a, b){ return Math.floor(a + rng() * (b - a + 1)); }
+    function randf(rng, a, b){ return a + rng() * (b - a); }
+    function rect(x,y,w,h){ return {x,y,w,h}; }
+    function rectsOverlap(a,b){ return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y; }
+    function pointInRect(px,py,rc){ return px>rc.x && px<rc.x+rc.w && py>rc.y && py<rc.y+rc.h; }
+    function rectInAny(walls, r){ for (const w of walls){ if (rectsOverlap(w,r)) return true; } return false; }
+    function pointInAny(walls, x,y){ for (const w of walls){ if (pointInRect(x,y,w)) return true; } return false; }
+
+    // ================== GAME STATE ==================
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+    const mini = document.getElementById('mini');
+    const mctx = mini.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+
+    const state = {
+      running:false, t:0, dt:0, last:0,
+      keys: new Set(), mouse:{x:0,y:0,down:false},
+      gp:null,
+      world:{ w: 2200, h: 1400 },
+      camera:{ x:0, y:0, zoom:1 },
+      player:null, ally:null, bullets:[], enemies:[], walls:[], intel:null, extractZone:null,
+      noise:0, won:false, lost:false,
+      weapons:[
+        { key:'AR', name:'AR-9', rpm:600, dmg:28, mag:30, reserve:90, reload:1.9, spread:0.035, speed:900 },
+        { key:'SMG', name:'Viper SMG', rpm:900, dmg:20, mag:40, reserve:160, reload:1.6, spread:0.055, speed:950 },
+        { key:'DMR', name:'DMR-7', rpm:300, dmg:45, mag:15, reserve:45, reload:2.2, spread:0.012, speed:1100 }
+      ],
+      weaponIndex:0,
+      opts: { difficulty: 'Normal', intelCount: 1, mapSize: 'Standard' },  // <-- OPTIONS DEFAULTS
+      net: {
+        role: 'solo',        // 'solo' | 'host' | 'client'
+        pc: null,
+        dc: null,
+        connected: false,
+        lastSnapT: 0,
+        clientInp: {ax:0, ay:0, aim:0, shoot:false, interact:false},
+        snapTimer: 0
+      }
+    };
+
+    // ================== MAP GEN ==================
+    function generateLevelLayout(){
+      const walls = [];
+      const safeStart = rect(0, H/2 - 140, 280, 280);
+      const seed = (Date.now() % 2147483647);
+      const rng = makeRNG(seed);
+      const count = randi(rng, 12, 18);
+      for (let i=0;i<count;i++){
+        const vertical = rng() < 0.5;
+        const thick = randi(rng, 30, 60);
+        const len = randi(rng, 250, 460);
+        const x = randi(rng, 200, state.world.w - 200);
+        const y = randi(rng, 80, state.world.h - 80);
+        const w = vertical ? thick : len;
+        const h = vertical ? len : thick;
+        const candidate = rect(x - (w>>1), y - (h>>1), w, h);
+        if (candidate.x < 0 || candidate.y < 0 || candidate.x + candidate.w > state.world.w || candidate.y + candidate.h > state.world.h) { i--; continue; }
+        if (rectsOverlap(candidate, safeStart)) { i--; continue; }
+        let bad = false;
+        for (const w2 of walls){
+          const areaOverlap = Math.max(0, Math.min(candidate.x+candidate.w, w2.x+w2.w) - Math.max(candidate.x, w2.x)) * Math.max(0, Math.min(candidate.y+candidate.h, w2.y+w2.h) - Math.max(candidate.y, w2.y));
+          const areaCand = candidate.w * candidate.h; if (areaOverlap > 0.35 * areaCand){ bad = true; break; }
+        }
+        if (bad) { i--; continue; }
+        walls.push(candidate);
+      }
+
+      // Intel
+      const rng2 = makeRNG(seed ^ 0x9e3779b9);
+      let intel = {x: state.world.w - 250, y: randi(rng2, 160, state.world.h-160), r:12, taken:false};
+      for (let t=0; t<80; t++){
+        const ix = randi(rng2, Math.floor(state.world.w*0.55), state.world.w-100);
+        const iy = randi(rng2, 120, state.world.h-120);
+        if (!pointInAny(walls, ix, iy)) { intel.x=ix; intel.y=iy; break; }
+      }
+      return { walls, intel };
+    }
+
+    function toast(msg, ms=2000){ const el = document.getElementById('toast'); if(!el) return; el.textContent=msg; el.style.display='block'; clearTimeout(el._t); el._t=setTimeout(()=>el.style.display='none', ms); }
+
+    // ======== APPLY OPTIONS + SETUP LEVEL ========
+    function setupLevel(){
+      // Map size
+      if (state.opts.mapSize === 'Small')       state.world = { w: 1600, h: 1000 };
+      else if (state.opts.mapSize === 'Large')  state.world = { w: 2800, h: 1800 };
+      else                                      state.world = { w: 2200, h: 1400 };
+
+      state.bullets.length=0; state.enemies.length=0; state.walls.length=0; state.won=false; state.lost=false; state.noise=0;
+      state.player = { x: 200, y: H/2, r: 14, hp: 100, speed: 180, dir: 0, fireCd:0, hasIntel:false, reloading:false, reloadT:0, ammo:[] };
+      state.player.ammo = state.weapons.map(w=>({mag:w.mag, reserve:w.reserve}));
+      state.weaponIndex = 0; updateWeaponHud();
+      state.ally = null;
+
+      const {walls, intel} = generateLevelLayout();
+      state.walls.push(...walls);
+      state.intel = intel;
+
+      state.extractZone = { x: 120, y: H/2 - 60, w: 160, h: 120, active:false };
+
+      // Difficulty multiplier
+      const d = state.opts.difficulty;
+      const mul = d==='Easy' ? 0.8 : d==='Hard' ? 1.3 : 1.0;
+
+      const makeEnemy = (x,y)=>({ x,y, r:12, hp:Math.round(60*mul), speed:120, state:'patrol', target:null, fireCd:0, angle:0, fov:Math.PI*0.8, viewDist:300*mul, hear: 200 });
+      const baseCount = 10 + Math.floor(Math.random()*6);
+      const enemyCount = Math.round(baseCount * mul);
+      let tries = 0;
+      while (state.enemies.length < enemyCount && tries < 300){
+        tries++;
+        const ex = intel.x + Math.floor((Math.random()-0.5)*600);
+        const ey = intel.y + Math.floor((Math.random()-0.5)*600);
+        if (ex<40||ey<40||ex>state.world.w-40||ey>state.world.h-40) continue;
+        if (pointInAny(state.walls, ex, ey)) continue;
+        if (Math.hypot(ex-200, ey-H/2) < 260) continue;
+        state.enemies.push(makeEnemy(ex, ey));
+      }
+
+      document.getElementById('enemyText').textContent = state.enemies.length.toString();
+      document.getElementById('intelText').textContent = `0 / 1`;
+      document.getElementById('extractMsg').style.display = 'none';
+    }
+
+    // ================== INPUT ==================
+    const downKeys = new Set();
+    window.addEventListener('keydown', e=>{
+      downKeys.add(e.code);
+      if (["KeyW","KeyA","KeyS","KeyD","Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Digit1","Digit2","Digit3","KeyR","KeyE"].includes(e.code)) e.preventDefault();
+      if (e.code==='Digit1') setWeapon(0);
+      if (e.code==='Digit2') setWeapon(1);
+      if (e.code==='Digit3') setWeapon(2);
+      if (e.code==='KeyR') startReload();
+      if (e.code==='KeyE') tryInteract();
+    });
+    window.addEventListener('keyup', e=> downKeys.delete(e.code));
+    state.keys = downKeys;
+
+    canvas.addEventListener('wheel', (e)=>{ e.preventDefault(); if (e.deltaY>0) cycleWeapon(1); else cycleWeapon(-1); }, {passive:false});
+    canvas.addEventListener('mousemove', e=>{ const r = canvas.getBoundingClientRect(); state.mouse.x = (e.clientX - r.left); state.mouse.y = (e.clientY - r.top); });
+    canvas.addEventListener('mousedown', ()=> state.mouse.down = true);
+    window.addEventListener('mouseup', ()=> state.mouse.down = false);
+
+    window.addEventListener('gamepadconnected', (e)=>{ state.gp = e.gamepad.index; toast('Controller connected'); });
+    window.addEventListener('gamepaddisconnected', ()=>{ state.gp=null; toast('Controller disconnected'); });
+    function readGamepad(){ if (state.gp==null) return null; return navigator.getGamepads()[state.gp]; }
+
+    // ================== NET (WebRTC) ==================
+    async function createPeer(role){
+      const pc = new RTCPeerConnection({
+        iceServers: [{ urls: ['stun:stun.l.google.com:19302','stun:global.stun.twilio.com:3478'] }]
+      });
+      state.net.pc = pc; state.net.role = role;
+      pc.oniceconnectionstatechange = ()=>{
+        if (pc.iceConnectionState === 'connected'){ state.net.connected = true; toast('P2P connected'); }
+        if (pc.iceConnectionState === 'disconnected' || pc.iceConnectionState === 'failed'){ state.net.connected = false; toast('P2P disconnected'); }
+      };
+      if (role === 'host'){
+        const dc = pc.createDataChannel('game', { ordered:false, maxRetransmits:0 });
+        wireDataChannel(dc);
+      } else {
+        pc.ondatachannel = (e)=> wireDataChannel(e.channel);
+      }
+      return pc;
+    }
+    function wireDataChannel(dc){
+      state.net.dc = dc;
+      dc.binaryType = 'arraybuffer';
+      dc.onopen = ()=>{
+        toast('DataChannel open');
+        if (state.net.role === 'host'){
+          state.ally = { x: state.player.x+24, y: state.player.y, r:14, hp:100, speed:180, dir:0, fireCd:0,
+            hasIntel:false, reloading:false, reloadT:0,
+            ammo: state.weapons.map(w=>({mag:w.mag, reserve:w.reserve})) };
+        }
+      };
+      dc.onmessage = (ev)=> handleNetMessage(ev.data);
+    }
+    function sendJSON(obj){ const dc = state.net.dc; if (!dc || dc.readyState!=='open') return; dc.send(JSON.stringify(obj)); }
+    function handleNetMessage(data){
+      let msg; try { msg = JSON.parse(data); } catch{ return; }
+      if (msg.type === 'inp' && state.net.role === 'host' && state.ally){
+        state.net.clientInp = msg.inp;
+      }
+      if (msg.type === 'snap' && state.net.role === 'client'){
+        applySnapshot(msg);
+      }
+    }
+    function makeSnapshot(){
+      const players = [{x:state.player.x,y:state.player.y,dir:state.player.dir,hp:state.player.hp}];
+      if (state.ally) players.push({x:state.ally.x,y:state.ally.y,dir:state.ally.dir,hp:state.ally.hp});
+      return {
+        type:'snap', t: performance.now(),
+        world:{w:state.world.w,h:state.world.h},
+        players,
+        bullets: state.bullets.slice(0,64).map(b=>({x:b.x,y:b.y,vx:b.vx,vy:b.vy,life:b.life,f:b.friendly})),
+        enemies: state.enemies.slice(0,32).map(e=>({x:e.x,y:e.y,a:e.angle,hp:e.hp})),
+        intel:{x:state.intel.x,y:state.intel.y,t:state.intel.taken},
+        extract:{x:state.extractZone.x,y:state.extractZone.y,w:state.extractZone.w,h:state.extractZone.h,a:state.extractZone.active},
+        noise: state.noise
+      };
+    }
+    function applySnapshot(s){
+      state.world.w=s.world.w; state.world.h=s.world.h;
+      state.bullets = s.bullets.map(b=>({x:b.x,y:b.y,vx:b.vx,vy:b.vy,life:b.life,dmg:15,friendly:b.f}));
+      state.enemies = s.enemies.map(e=>({x:e.x,y:e.y,angle:e.a,hp:e.hp,r:12,speed:120,state:'patrol',fireCd:0,fov:Math.PI*0.8,viewDist:300,hear:200}));
+      const p0=s.players[0]; if (p0){ state.player.x=p0.x; state.player.y=p0.y; state.player.dir=p0.dir; state.player.hp=p0.hp; }
+      const p1=s.players[1];
+      if (p1){
+        if (!state.ally){
+          state.ally={ x:p1.x,y:p1.y,r:14,hp:p1.hp,speed:180,dir:p1.dir,fireCd:0,hasIntel:false,reloading:false,reloadT:0, ammo: state.weapons.map(w=>({mag:w.mag,reserve:w.reserve}))};
+        } else { state.ally.x=p1.x; state.ally.y=p1.y; state.ally.dir=p1.dir; state.ally.hp=p1.hp; }
+      }
+      state.intel.x=s.intel.x; state.intel.y=s.intel.y; state.intel.taken=s.intel.t;
+      state.extractZone.x=s.extract.x; state.extractZone.y=s.extract.y; state.extractZone.w=s.extract.w; state.extractZone.h=s.extract.h; state.extractZone.active=s.extract.a;
+      state.noise = s.noise;
+    }
+    async function hostCreateOffer(){
+      await createPeer('host');
+      const pc=state.net.pc;
+      const offer=await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      await new Promise(r=> pc.onicecandidate = e=>{ if(!e.candidate) r(); });
+      document.getElementById('hostOffer').value = JSON.stringify(pc.localDescription);
+      toast('Offer created — copy it to your friend');
+    }
+    async function hostConnectWithAnswer(){
+      const ansStr=document.getElementById('hostAnswer').value.trim();
+      if(!ansStr) return toast('Paste client answer first');
+      const pc=state.net.pc; if(!pc) return toast('Create offer first');
+      await pc.setRemoteDescription(JSON.parse(ansStr));
+      toast('Connecting…');
+    }
+    async function clientCreateAnswer(){
+      const offerStr=document.getElementById('joinOffer').value.trim();
+      if(!offerStr) return toast('Paste the host offer first');
+      const pc=await createPeer('client');
+      await pc.setRemoteDescription(JSON.parse(offerStr));
+      const answer=await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+      await new Promise(r=> pc.onicecandidate = e=>{ if(!e.candidate) r(); });
+      const sdp=JSON.stringify(pc.localDescription);
+      document.getElementById('joinAnswer').value = sdp;
+      try{ await navigator.clipboard.writeText(sdp); toast('Answer copied to clipboard'); }catch{}
+    }
+
+    // ================== PHYSICS / COLLISION ==================
+    function moveWithColliders(obj, vx, vy){
+      const tryMove = (dx,dy)=>{
+        obj.x += dx; obj.y += dy;
+        for (const w of state.walls){ if (obj.x> w.x-obj.r && obj.x< w.x+w.w+obj.r && obj.y> w.y-obj.r && obj.y< w.y+w.h+obj.r){
+            if (dx>0) obj.x = w.x-obj.r; if (dx<0) obj.x = w.x+w.w+obj.r; if (dy>0) obj.y = w.y-obj.r; if (dy<0) obj.y = w.y+w.h+obj.r;
+        }}
+        obj.x = clamp(obj.x, obj.r, state.world.w-obj.r); obj.y = clamp(obj.y, obj.r, state.world.h-obj.r);
+      };
+      tryMove(vx*state.dt, 0); tryMove(0, vy*state.dt);
+    }
+
+    // ================== ENEMY AI ==================
+    function updateEnemy(e){
+      const p1 = state.player, p2 = state.ally || state.player;
+      const tgt = (!state.ally || Math.hypot(p1.x-e.x, p1.y-e.y) <= Math.hypot(p2.x-e.x, p2.y-e.y)) ? p1 : p2;
+      const toP = {x:tgt.x - e.x, y:tgt.y - e.y};
+      const angToP = Math.atan2(toP.y, toP.x); const angDiff = Math.atan2(Math.sin(angToP - e.angle), Math.cos(angToP - e.angle));
+      const see = (Math.abs(angDiff) < e.fov*0.5) && (Math.hypot(toP.x,toP.y) < e.viewDist) && lineOfSight(e, tgt, state.walls);
+      const hear = (Math.hypot(toP.x,toP.y) < e.hear * (1 + state.noise*0.8));
+      if (see || hear) { e.state = 'hunt'; e.target = {x:tgt.x, y:tgt.y}; }
+
+      if (e.state==='patrol'){
+        if (!e._patrol || Math.random()<0.01) e._patrol = { x: e.x + rand(-200,200), y: e.y + rand(-200,200) };
+        const v = { x: e._patrol.x - e.x, y: e._patrol.y - e.y }; const d = Math.hypot(v.x,v.y);
+        if (d>5){ e.angle = Math.atan2(v.y,v.x); moveWithColliders(e, Math.cos(e.angle)*e.speed*0.4, Math.sin(e.angle)*e.speed*0.4); }
+      }
+
+      if (e.state==='hunt'){
+        const v = { x: tgt.x - e.x, y: tgt.y - e.y }; const d = Math.hypot(v.x,v.y);
+        e.angle = Math.atan2(v.y,v.x);
+        if (d>220) moveWithColliders(e, Math.cos(e.angle)*e.speed*0.7, Math.sin(e.angle)*e.speed*0.7);
+        e.fireCd -= state.dt; if (d<420 && lineOfSight(e, tgt, state.walls) && e.fireCd<=0){ shootFrom(e, e.angle, false); e.fireCd = 0.9 + Math.random()*0.5; }
+      }
+    }
+
+    // ================== WEAPONS / SHOOTING / RELOAD ==================
+    function shootFrom(from, angle, friendly=true, weapon=null){
+      const w = weapon || {speed:800, spread: friendly?0.035:0.06, dmg: friendly?32:15};
+      const speed = w.speed; const spread = friendly ? (w.spread ?? 0.035) : 0.06; const dmg = friendly ? (w.dmg ?? 28) : 15;
+      const a = angle + rand(-spread, spread);
+      const b = { x: from.x + Math.cos(a)*from.r, y: from.y + Math.sin(a)*from.r, vx: Math.cos(a)*speed, vy: Math.sin(a)*speed, life: 0.9, dmg, friendly };
+      state.bullets.push(b);
+      state.noise = clamp(state.noise + (friendly? 0.15: 0.05), 0, 1);
+    }
+
+    function tryShoot(angle){
+      const p = state.player; const w = state.weapons[state.weaponIndex]; const a = state.player.ammo[state.weaponIndex];
+      if (p.fireCd>0) return;
+      if (p.reloading && a.mag>0){ p.reloading=false; p.reloadT=0; }
+      if (a.mag<=0){ startReload(); return; }
+      shootFrom(p, angle, true, w);
+      a.mag -= 1;
+      p.fireCd = 60 / w.rpm;
+      updateWeaponHud();
+    }
+
+    function updateWeaponHud(){
+      const w = state.weapons[state.weaponIndex]; const a = state.player?.ammo?.[state.weaponIndex] || {mag:0,reserve:0};
+      document.getElementById('weaponText').textContent = w.name;
+      document.getElementById('ammoText').textContent = `${a.mag} / ${a.reserve}`;
+      document.getElementById('reloadBar').style.width = state.player?.reloading ? '5%' : '0%';
+    }
+    function setWeapon(i){ state.weaponIndex = (i+state.weapons.length)%state.weapons.length; state.player.fireCd = 0; state.player.reloading=false; state.player.reloadT=0; updateWeaponHud(); }
+    function cycleWeapon(d){ setWeapon(state.weaponIndex + d); }
+    function startReload(){
+      const w = state.weapons[state.weaponIndex]; const a = state.player.ammo[state.weaponIndex];
+      if (state.player.reloading) return;
+      if (a.mag>=w.mag) return;
+      if (a.reserve<=0) { toast('No reserve ammo'); return; }
+      state.player.reloading = true; state.player.reloadT = w.reload; document.getElementById('reloadBar').style.width = '1%';
+    }
+    function finishReload(){
+      const w = state.weapons[state.weaponIndex]; const a = state.player.ammo[state.weaponIndex];
+      const needed = w.mag - a.mag; const take = Math.min(needed, a.reserve);
+      a.mag += take; a.reserve -= take;
+      state.player.reloading=false; state.player.reloadT=0; document.getElementById('reloadBar').style.width = '0%'; updateWeaponHud();
+    }
+
+    function computeAimAngle(){
+      return Math.atan2((state.mouse.y + state.camera.y) - state.player.y, (state.mouse.x + state.camera.x) - state.player.x);
+    }
+
+    // ================== GAME LOOP ==================
+    function step(ts){
+      if (!state.running) return; requestAnimationFrame(step);
+      state.dt = Math.min(0.033, (ts - state.last)/1000 || 0.016); state.last = ts; state.t += state.dt;
+
+      // INPUT
+      let ax=0, ay=0;
+      if (state.keys.has('KeyW') || state.keys.has('ArrowUp')) ay -= 1;
+      if (state.keys.has('KeyS') || state.keys.has('ArrowDown')) ay += 1;
+      if (state.keys.has('KeyA') || state.keys.has('ArrowLeft')) ax -= 1;
+      if (state.keys.has('KeyD') || state.keys.has('ArrowRight')) ax += 1;
+      let aimAngle = computeAimAngle();
+
+      const gp = readGamepad();
+      if (gp){
+        const dead = 0.2; const lx = Math.abs(gp.axes[0])>dead ? gp.axes[0] : 0; const ly = Math.abs(gp.axes[1])>dead ? gp.axes[1] : 0;
+        const rx = Math.abs(gp.axes[2])>dead ? gp.axes[2] : 0; const ry = Math.abs(gp.axes[3])>dead ? gp.axes[3] : 0;
+        ax = lx; ay = ly; if (rx||ry) aimAngle = Math.atan2(ry, rx);
+        const rt = gp.buttons[7]?.value || 0; if (rt>0.3) tryShoot(aimAngle);
+        if (gp.buttons[0]?.pressed) tryInteract();
+      }
+
+      // CLIENT: send inputs to host
+      if (state.net.role === 'client' && state.net.connected){
+        sendJSON({type:'inp', inp:{ ax, ay, aim: aimAngle, shoot: !!state.mouse.down, interact: !!state.keys.has('KeyE') }});
+      }
+
+      // PLAYER UPDATE
+      const p = state.player; if (!p) return;
+      const mag = Math.hypot(ax,ay) || 1; const vx = (ax/mag)*p.speed; const vy = (ay/mag)*p.speed;
+      moveWithColliders(p, vx, vy);
+
+      p.dir = aimAngle; if (state.mouse.down) tryShoot(p.dir);
+
+      // HOST: drive ally from client inputs
+      if (state.net.role === 'host' && state.net.connected && state.ally){
+        const i = state.net.clientInp; const a = state.ally;
+        const mag2 = Math.hypot(i.ax, i.ay) || 1; const vx2=(i.ax/mag2)*a.speed, vy2=(i.ay/mag2)*a.speed;
+        moveWithColliders(a, vx2, vy2); a.dir = i.aim;
+        if (i.shoot){
+          const wIdx=0; const w=state.weapons[wIdx]; const ammo=a.ammo[wIdx];
+          if (a.fireCd<=0 && ammo.mag>0){ shootFrom(a, a.dir, true, w); ammo.mag--; a.fireCd = 60/w.rpm; }
+        }
+        a.fireCd = Math.max(0, a.fireCd - state.dt);
+      }
+
+      // Timers
+      if (p.reloading){
+        p.reloadT -= state.dt; const w = state.weapons[state.weaponIndex];
+        const elapsed = w.reload - Math.max(0,p.reloadT);
+        document.getElementById('reloadBar').style.width = Math.round((elapsed / w.reload)*100) + '%';
+        if (p.reloadT<=0) finishReload();
+      }
+      p.fireCd = Math.max(0, p.fireCd - state.dt);
+
+      const isClient = (state.net.role === 'client' && state.net.connected);
+      if (!isClient){
+        // Bullets
+        for (let i=state.bullets.length-1;i>=0;i--){
+          const b = state.bullets[i]; b.life -= state.dt; if (b.life<=0){ state.bullets.splice(i,1); continue; }
+          b.x += b.vx*state.dt; b.y += b.vy*state.dt;
+          for (const w of state.walls){ if (b.x> w.x && b.x< w.x+w.w && b.y> w.y && b.y< w.y+w.h){ state.bullets.splice(i,1); continue; } }
+          if (b.friendly){
+            for (let j=state.enemies.length-1;j>=0;j--){ const e = state.enemies[j]; if (Math.hypot(e.x-b.x, e.y-b.y) < e.r){ e.hp -= b.dmg; state.bullets.splice(i,1); if (e.hp<=0) state.enemies.splice(j,1); break; } }
+          } else {
+            const hitLocal = Math.hypot(p.x-b.x, p.y-b.y) < p.r;
+            const hitAlly = state.ally && Math.hypot(state.ally.x-b.x, state.ally.y-b.y) < state.ally.r;
+            if (hitLocal){ p.hp -= b.dmg; state.bullets.splice(i,1); if (p.hp<=0) gameOver(false); }
+            else if (hitAlly){ state.ally.hp -= b.dmg; state.bullets.splice(i,1); }
+          }
+        }
+
+        // Enemies
+        for (const e of state.enemies) updateEnemy(e);
+
+        // Intel
+        if (!state.intel.taken && dist(p, state.intel) < p.r + state.intel.r){ state.intel.taken=true; p.hasIntel=true; document.getElementById('intelText').textContent = `1 / 1`; state.extractZone.active=true; document.getElementById('extractMsg').style.display='block'; toast('Intel secured. Head to extract!'); }
+
+        // Extract
+        if (state.extractZone.active && p.x>state.extractZone.x && p.x<state.extractZone.x+state.extractZone.w && p.y>state.extractZone.y && p.y<state.extractZone.y+state.extractZone.h){ if (p.hasIntel) gameOver(true); }
+
+        // Noise
+        state.noise = Math.max(0, state.noise - state.dt*0.15);
+
+        // Camera with deadzone
+        const DZ_W = W * 0.45, DZ_H = H * 0.45;
+        const dzLeft = state.camera.x + (W - DZ_W)/2;
+        const dzRight = dzLeft + DZ_W;
+        const dzTop = state.camera.y + (H - DZ_H)/2;
+        const dzBottom = dzTop + DZ_H;
+        const clampCam = ()=>{ state.camera.x = clamp(state.camera.x, 0, state.world.w - W); state.camera.y = clamp(state.camera.y, 0, state.world.h - H); };
+        if (p.x < dzLeft) state.camera.x = p.x - DZ_W/2;
+        else if (p.x > dzRight) state.camera.x = p.x + DZ_W/2 - W;
+        if (p.y < dzTop) state.camera.y = p.y - DZ_H/2;
+        else if (p.y > dzBottom) state.camera.y = p.y + DZ_H/2 - H;
+        clampCam();
+      }
+
+      // Render
+      const mouseWorld = { x: state.mouse.x + state.camera.x, y: state.mouse.y + state.camera.y };
+      const hasLOS = lineOfSight(p, mouseWorld, state.walls);
+      draw(hasLOS);
+
+      // HUD
+      document.getElementById('hpBar').style.width = clamp(p.hp,0,100) + '%';
+      document.getElementById('noiseBar').style.width = Math.round(state.noise*100) + '%';
+      document.getElementById('enemyText').textContent = state.enemies.length.toString();
+
+      // HOST: periodic snapshot to client
+      if (state.net.role === 'host' && state.net.connected){
+        state.net.snapTimer += state.dt;
+        if (state.net.snapTimer > 0.1){ sendJSON(makeSnapshot()); state.net.snapTimer = 0; }
+      }
+    }
+
+    function draw(hasLOS){
+      const cam = state.camera; ctx.clearRect(0,0,W,H);
+      ctx.save(); ctx.translate(-cam.x, -cam.y);
+
+      // Grid
+      ctx.fillStyle = '#0a122b'; ctx.fillRect(cam.x, cam.y, W, H);
+      ctx.strokeStyle = '#0f1a3a'; ctx.lineWidth = 1;
+      for (let x=0; x<state.world.w; x+=40){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,state.world.h); ctx.stroke(); }
+      for (let y=0; y<state.world.h; y+=40){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(state.world.w,y); ctx.stroke(); }
+
+      // Walls
+      ctx.fillStyle = '#15214a'; ctx.strokeStyle = '#29408a';
+      for (const w of state.walls){ ctx.fillRect(w.x,w.y,w.w,w.h); ctx.strokeRect(w.x+0.5,w.y+0.5,w.w-1,w.h-1); }
+
+      // Extract zone
+      if (state.extractZone.active){ const z = state.extractZone; ctx.fillStyle = 'rgba(0,255,120,0.12)'; ctx.fillRect(z.x, z.y, z.w, z.h); ctx.strokeStyle = '#3cff95'; ctx.strokeRect(z.x+0.5, z.y+0.5, z.w-1, z.h-1); }
+
+      // Intel
+      if (!state.intel.taken){ ctx.beginPath(); ctx.arc(state.intel.x, state.intel.y, state.intel.r, 0, TAU); ctx.fillStyle = '#3bd1ff'; ctx.fill(); ctx.strokeStyle = '#7be0ff'; ctx.stroke(); }
+
+      // Bullets
+      ctx.strokeStyle = '#a6bfff'; ctx.lineWidth = 2;
+      for (const b of state.bullets){ ctx.beginPath(); ctx.moveTo(b.x, b.y); ctx.lineTo(b.x - b.vx*0.02, b.y - b.vy*0.02); ctx.stroke(); }
+
+      // Player & Enemies
+      const p = state.player; drawSoldier(p.x, p.y, p.dir, '#7cff6b');
+      if (state.ally){ drawSoldier(state.ally.x, state.ally.y, state.ally.dir, '#6bd1ff'); }
+      for (const e of state.enemies){ drawSoldier(e.x, e.y, e.angle, '#ff6b6b'); }
+
+      ctx.restore();
+
+      // Minimap
+      drawMinimap();
+
+      // Crosshair in screen space
+      const cx = state.mouse.x, cy = state.mouse.y; ctx.save(); ctx.translate(cx, cy);
+      ctx.strokeStyle = hasLOS ? '#7cff6b' : '#ff6b6b'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(-10,0); ctx.lineTo(-2,0); ctx.moveTo(2,0); ctx.lineTo(10,0); ctx.moveTo(0,-10); ctx.lineTo(0,-2); ctx.moveTo(0,2); ctx.lineTo(0,10); ctx.stroke();
+      ctx.beginPath(); ctx.arc(0,0, 3, 0, TAU); ctx.stroke(); ctx.restore();
+    }
+
+    function drawSoldier(x,y,angle,color){ ctx.save(); ctx.translate(x, y); ctx.rotate(angle); ctx.fillStyle = color; ctx.beginPath(); ctx.arc(0,0, 14, 0, TAU); ctx.fill(); ctx.fillStyle = '#0a0f20'; ctx.beginPath(); ctx.arc(0,0, 8, 0, TAU); ctx.fill(); ctx.fillStyle = color; ctx.fillRect(2, -3, 16, 6); ctx.restore(); }
+
+    function drawMinimap(){
+      const scaleX = mini.width / state.world.w; const scaleY = mini.height / state.world.h;
+      mctx.clearRect(0,0,mini.width,mini.height);
+      mctx.fillStyle = '#0b1330'; mctx.fillRect(0,0,mini.width,mini.height);
+      mctx.fillStyle = '#1a2b60'; for (const w of state.walls){ mctx.fillRect(w.x*scaleX, w.y*scaleY, w.w*scaleX, w.h*scaleY);} 
+      if (state.extractZone.active){ const z = state.extractZone; mctx.strokeStyle = '#3cff95'; mctx.strokeRect(z.x*scaleX+0.5, z.y*scaleY+0.5, z.w*scaleX-1, z.h*scaleY-1); }
+      if (!state.intel.taken){ mctx.fillStyle = '#3bd1ff'; mctx.fillRect(state.intel.x*scaleX-2, state.intel.y*scaleY-2, 4, 4); }
+      mctx.fillStyle = '#ff6b6b'; for (const e of state.enemies){ mctx.fillRect(e.x*scaleX-1, e.y*scaleY-1, 2, 2);} 
+      mctx.fillStyle = '#7cff6b'; const p = state.player; mctx.fillRect(p.x*scaleX-2, p.y*scaleY-2, 4, 4);
+      if (state.ally){ mctx.fillStyle = '#6bd1ff'; mctx.fillRect(state.ally.x*scaleX-2, state.ally.y*scaleY-2, 4, 4); }
+    }
+
+    function tryInteract(){ const p = state.player; if (!state.intel.taken && dist(p, state.intel) < p.r + state.intel.r + 4){ state.intel.taken=true; p.hasIntel=true; document.getElementById('intelText').textContent = `1 / 1`; state.extractZone.active=true; document.getElementById('extractMsg').style.display='block'; toast('Intel secured. Head to extract!'); } }
+
+    function gameOver(won){ state.running=false; state.won=won; document.getElementById('menu').style.display='grid'; const t=document.querySelector('#menu .subtitle'); t.innerHTML = won? 'Extraction complete. Mission success. <strong>Play again?</strong>':'You were neutralized. <strong>Retry?</strong>'; }
+
+    // ================== UI BINDINGS (null-safe) ==================
+    (function bindUI(){
+      const $ = id => document.getElementById(id);
+      const show = id => { const el = $(id); if (el) el.style.display = 'block'; };
+      const hide = id => { const el = $(id); if (el) el.style.display = 'none'; };
+
+      // Central actions
+      const actions = {
+        startBtn: () => {
+          setupLevel();
+          state.running = true;
+          state.last = performance.now();
+          hide('menu');
+          const cvs = $('game'); if (cvs) cvs.focus();
+          requestAnimationFrame(step);
+        },
+        howBtn: () => toast('Secure the Intel (blue), then reach the green extraction zone near spawn. Avoid patrols; shoot sparingly to keep noise low.'),
+        gpBtn: () => { const gp = readGamepad(); toast(gp ? 'Controller active. Left stick move, right stick aim, RT shoot, A interact.' : 'Press any button on your controller.'); },
+        mpBtn: () => { show('mpModal'); },
+        mpClose: () => { hide('mpModal'); },
+
+        hostCreate: hostCreateOffer,
+        hostCopy: async () => {
+          const v = $('hostOffer')?.value || '';
+          if (!v) return toast('No offer yet');
+          try { await navigator.clipboard.writeText(v); toast('Offer copied'); }
+          catch { toast('Copy failed — select & copy'); }
+        },
+        hostConnect: hostConnectWithAnswer,
+
+        joinCreate: clientCreateAnswer,
+        joinCopy: async () => {
+          const v = $('joinAnswer')?.value || '';
+          if (!v) return toast('No answer yet');
+          try { await navigator.clipboard.writeText(v); toast('Answer copied'); }
+          catch { toast('Copy failed — select & copy'); }
+        },
+      };
+
+      // Attach directly if element exists
+      for (const id in actions) {
+        const el = $(id);
+        if (el) el.addEventListener('click', (e)=>{ e.preventDefault(); actions[id](); });
+      }
+
+      // Delegated fallback
+      document.addEventListener('click', (e)=>{
+        const el = e.target.closest('#startBtn,#howBtn,#gpBtn,#mpBtn,#mpClose,#hostCreate,#hostCopy,#hostConnect,#joinCreate,#joinCopy');
+        if (!el) return;
+        const fn = actions[el.id];
+        if (fn) { e.preventDefault(); fn(); }
+      }, true);
+
+      // ---- Expose legacy helpers for inline onclick ----
+      window.__startGame = actions.startBtn;
+      window.__openMP   = actions.mpBtn;
+    })();
+
+    // ===== Options helpers (global) =====
+    window.__openOpts = function(){
+      const m=document.getElementById('optModal'); if(m) m.style.display='block';
+      const o=state.opts;
+      const d=document.getElementById('optDifficulty'); if(d) d.value=o.difficulty;
+      const i=document.getElementById('optIntel');      if(i) i.value=String(o.intelCount);
+      const s=document.getElementById('optMap');        if(s) s.value=o.mapSize;
+    };
+    window.__optsClose = function(){ const m=document.getElementById('optModal'); if(m) m.style.display='none'; };
+    window.__optsSave = function(){
+      const d=document.getElementById('optDifficulty')?.value || 'Normal';
+      const i=parseInt(document.getElementById('optIntel')?.value||'1',10);
+      const s=document.getElementById('optMap')?.value || 'Standard';
+      state.opts = { difficulty:d, intelCount: Math.max(1, Math.min(3, i||1)), mapSize:s };
+      toast('Options saved — start a New Operation to apply.');
+      window.__optsClose();
+    };
+
+    // ================== DEV TESTS ==================
+    function runTests(){
+      const results = [];
+      function t(name, fn){ try{ fn(); results.push(['PASS', name]); } catch(err){ console.error(err); results.push(['FAIL', name+': '+err.message]); } }
+
+      // Test 1: reload math
+      t('Reload fills up to mag and reduces reserve', ()=>{
+        const w = {mag:30}; const a = {mag:12, reserve:17};
+        const needed = w.mag - a.mag; const take = Math.min(needed, a.reserve);
+        if (take !== 17) throw new Error('expected take=17');
+      });
+
+      // Test 2: aim angle world-space
+      t('Aim computed in world space accounts for camera', ()=>{
+        state.camera.x = 100; state.camera.y = 50; state.player = {x:200,y:200}; state.mouse = {x:100,y:150};
+        const ang = computeAimAngle();
+        const dx = (state.mouse.x+state.camera.x) - state.player.x;
+        const dy = (state.mouse.y+state.camera.y) - state.player.y;
+        if (Math.abs(Math.atan2(dy,dx) - ang) > 1e-9) throw new Error('angle mismatch');
+      });
+
+      // Test 3: move clamps world bounds (start in-bounds, then push past)
+      t('moveWithColliders clamps to world (no unintended left move when starting in-bounds)', ()=>{
+        const obj = { x: state.world.w - 20, y: state.world.h - 20, r: 14 };
+        const beforeX = obj.x;
+        state.dt = 0.016;
+        moveWithColliders(obj, 1000, 1000);
+        if (obj.x !== state.world.w - obj.r || obj.y !== state.world.h - obj.r) {
+          throw new Error('did not clamp to max bounds');
+        }
+        if (obj.x < beforeX) throw new Error('unexpected left move');
+      });
+
+      // Test 4: shootFrom adds bullet
+      t('shootFrom spawns bullet + noise', ()=>{
+        const bulletsBefore = state.bullets.length; const n0 = state.noise;
+        shootFrom({x:10,y:10,r:5}, 0, true, {speed:800, spread:0, dmg:10});
+        if (state.bullets.length !== bulletsBefore+1) throw new Error('no bullet');
+        if (state.noise <= n0) throw new Error('noise did not increase');
+      });
+
+      const fails = results.filter(r=>r[0]==='FAIL');
+      if (fails.length){ toast('Tests: '+fails.length+' failed — check console'); }
+      else { console.log('All tests passed'); }
+    }
+
+    // Boot once so minimap renders; tests run once
+    setupLevel(); runTests(); (function firstDraw(){ const p=state.player; if(!p) return; const mouseWorld={x:state.mouse.x+state.camera.x,y:state.mouse.y+state.camera.y}; draw(lineOfSight(p, mouseWorld, state.walls)); })();
+
+  })();
+  </script>
+</body>
+</html>

@@ -1,37 +1,40 @@
-# 🌊 Tide v3.7 (Patriotic)
+# 🌊 Tide v4 – Dual Currents
 
-**a proxy of minimalism, for modern times.**  
-Created by the Tide Team and [xXmizzeryXx](https://github.com/xXmizzeryXx) (or just Mizzery, doesn’t matter.)
+**A minimalist proxy for modern times.**  
+Created by the Tide Team and [xXmizzeryXx](https://github.com/xXmizzeryXx).
 
 ---
 
-> Tide is no longer just chill — it’s **charged.**  
-> Now officially part of the **[Elusion](https://dsc.gg/elusionprox)** family.
+> Tide is no longer just a proxy — it’s a **horizon of possibilities.**  
+> Access your favorite apps, games, and tools quickly and elegantly.
 
 ## ⚡ Overview
 
-Tide is a sleek, minimalist web proxy for speed, style, and simplicity. Whether trying to access blocked content or just wanting a distraction-free UI, Tide’s got you covered. Designed with modern aesthetics and packed with frequent UI and game updates, it’s not just a tool—it’s an experience.
+Tide is a sleek, minimalist web interface designed to put the user first.  
+Whether launching tools, playing games, or browsing content, everything is accessible in one place — clean, fast, and distraction-free.  
 
-Join the wave today and **ride the tide.** 🌊
+With smooth transitions, intuitive navigation, and modular widgets, **Tide v4** turns your browser into a modern school proxy and productivity hub.
 
-## 🎆 What’s New in v3.7 (Patriotic Edition)
+## 🎆 What’s New in v4.0
 
-- 🗽 Red, white, and blue theme for the 4th of July 🇺🇸  
-- ⚡ Performance improvements  
-- 🎮 New game additions  
-- 🧩 Sidebar widget system (Battery, Time, Navigation)  
-- 💫 Updated gradient styles and transition effects  
-- 🪄 Easter eggs and more
+- 🌈 **Dual Currents:** Upgraded dynamic gradients for a fresh, modern look  
+- 📱 **Expanded Apps Hub:** More apps than ever before  
+- ▶️ **YouTube Player:** Stream directly in Tide (thanks to norepted & wea-f!)  
+- 🎮 **More Games:** Integrated directly into the hub  
+- 🧩 **Sidebar Widgets:** Time, battery, and quick navigation  
+- 💫 **Enhanced Animations & Transitions** – silky smooth and satisfying  
+- 🪄 **Hidden Easter Eggs** and subtle UI enhancements  
 
 ## ✨ Features
 
-- 💻 **Minimalist UI** – Clean, centered, smooth.  
-- 🛠️ **Customizable** – Themes, gradients, and animations.  
-- 🎮 **Built-in Games** – Access fun directly from the interface.  
-- 🧩 **Modular Sidebar** – Time, battery life, and quick nav.  
-- 🌐 **Unblocked Access** – Bypass restrictions with ease.  
-- 📦 **No Backend Required** – Simple, static, and fast.  
-- 🔌 **Elusion Compatible** – Now part of a larger proxy ecosystem.
+- 📱 **Centralized Apps Hub** – Launch everything from one screen  
+- 💻 **Minimalist UI** – Clean, centered, distraction-free  
+- 🎮 **Built-in Games** – Play without leaving Tide  
+- 🧩 **Modular Sidebar** – Widgets for time, battery, and quick nav  
+- 🌐 **Unblocked Access** – All apps work through Tide’s proxy core  
+- 🔧 **Customizable** – Themes, gradients, and animations  
+- 📦 **Static & Fast** – No backend required  
+- 🔌 **Elusion Compatible** – Part of the wider Elusion ecosystem  
 
 ## 🚀 Tech Stack
 
@@ -41,12 +44,13 @@ Join the wave today and **ride the tide.** 🌊
 
 ## 🧭 Navigation
 
-- `Movies` 🎥  
-- `Games` 🎮  
-- `Credits` 💬  
-- `Chat` 💻  
+- `Apps` 📱 – Primary hub  
+- `Games` 🎮 – Fun and integrated  
+- `Movies` 🎥 – Watch directly  
+- `Chat` 💬 – Connect quickly  
+- `Credits` ℹ️ – Meet the team  
 
-All accessible via the animated sidebar.
+All accessible via the **Sidebar** with icon-based navigation.
 
 ## 🛠️ Setup
 
